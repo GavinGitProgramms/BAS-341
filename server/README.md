@@ -45,13 +45,11 @@ This document provides an overview of the API endpoints for the application, alo
 
 ### Starting the Server
 
-Before testing the endpoints, make sure to start the server. While the specific command might vary based on your project setup, generally, you would run:
+Before testing the endpoints, make sure to start the server:
 
 ```
 npm start
 ```
-
-Ensure that you have all the required dependencies installed.
 
 ### Endpoints
 
@@ -76,7 +74,7 @@ Ensure that you have all the required dependencies installed.
 **Sample `curl` Command**:
 
 ```bash
-curl -X POST http://localhost:YOUR_PORT/register \
+curl -X POST http://localhost:3000/register \
      -H "Content-Type: application/json" \
      -d '{"username": "test", "type": "REGULAR", "first_name": "Foo", "last_name": "Bar", "email": "foo@bar.com", "phone_number": "+1 608 781-8181", "password": "letmein"}' \
      -c cookies.txt
@@ -100,9 +98,9 @@ curl -X POST http://localhost:YOUR_PORT/register \
 **Sample `curl` Command**:
 
 ```
-curl -X POST http://localhost:YOUR_PORT/login \
+curl -X POST http://localhost:3000/login \
      -H "Content-Type: application/json" \
-     -d '{"username": "YOUR_USERNAME", "password": "YOUR_PASSWORD"}' \
+     -d '{"username": "test", "password": "letmein"}' \
      -c cookies.txt
 ```
 
@@ -119,7 +117,7 @@ curl -X POST http://localhost:YOUR_PORT/login \
 **Sample `curl` Command**:
 
 ```
-curl -X GET http://localhost:YOUR_PORT/logout -b cookies.txt
+curl -X GET http://localhost:3000/logout -b cookies.txt
 ```
 
 > This command uses the session cookie from cookies.txt.
@@ -135,9 +133,8 @@ curl -X GET http://localhost:YOUR_PORT/logout -b cookies.txt
 **Sample `curl` Command**:
 
 ```
-curl -X GET http://localhost:YOUR_PORT/ -b cookies.txt
+curl -X GET http://localhost:3000/ -b cookies.txt
 ```
 
 > This command uses the session cookie from cookies.txt.
 
-> Note: Replace `YOUR_PORT` with the port number your server is running on, and `YOUR_USERNAME` and `YOUR_PASSWORD` with the appropriate values you want to test with.
