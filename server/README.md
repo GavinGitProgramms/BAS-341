@@ -74,7 +74,7 @@ npm start
 **Sample `curl` Command**:
 
 ```bash
-curl -X POST http://localhost:3000/register \
+curl -X POST http://localhost:3000/auth/register \
      -H "Content-Type: application/json" \
      -d '{"username": "test", "type": "REGULAR", "first_name": "Foo", "last_name": "Bar", "email": "foo@bar.com", "phone_number": "+1 608 781-8181", "password": "letmein"}' \
      -c cookies.txt
@@ -98,7 +98,7 @@ curl -X POST http://localhost:3000/register \
 **Sample `curl` Command**:
 
 ```
-curl -X POST http://localhost:3000/login \
+curl -X POST http://localhost:3000/auth/login \
      -H "Content-Type: application/json" \
      -d '{"username": "test", "password": "letmein"}' \
      -c cookies.txt
@@ -117,7 +117,7 @@ curl -X POST http://localhost:3000/login \
 **Sample `curl` Command**:
 
 ```
-curl -X GET http://localhost:3000/logout -b cookies.txt
+curl -X GET http://localhost:3000/auth/logout -b cookies.txt
 ```
 
 > This command uses the session cookie from cookies.txt.
@@ -133,8 +133,7 @@ curl -X GET http://localhost:3000/logout -b cookies.txt
 **Sample `curl` Command**:
 
 ```
-curl -X GET http://localhost:3000/ -b cookies.txt
+curl -X GET http://localhost:3000/appointment -b cookies.txt
 ```
 
 > This command uses the session cookie from cookies.txt.
-

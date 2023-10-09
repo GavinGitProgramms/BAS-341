@@ -10,7 +10,7 @@ import {
 import { AppointmentType } from './Enums'
 import { User } from './User'
 
-@Entity({ name: 'appointment' })
+@Entity({ schema: 'public', name: 'appointment' })
 export class Appointment {
   @PrimaryGeneratedColumn('uuid')
   id: string

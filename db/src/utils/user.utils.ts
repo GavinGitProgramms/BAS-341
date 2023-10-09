@@ -24,7 +24,7 @@ export function hashPassword(password: string): string {
 export async function getUser({ username }: GetUserArgs): Promise<User | null> {
   await ensureInitialized()
   const userRepo = AppDataSource.getRepository(User)
-  const user = await userRepo.findOne({ where: { username } })
+  const user = await userRepo.findOneBy({ username })
   return user
 }
 
@@ -69,7 +69,7 @@ export async function createUser({
   password,
 }: CreateUserArgs): Promise<User | null> {
   await ensureInitialized()
-
+  const userRepo = AppDataSource.getRepository(User)
   const user = new User()
   user.username = username
   user.type = type
@@ -78,9 +78,7 @@ export async function createUser({
   user.email = email
   user.phone_number = phone_number
   user.password_hash = hashPassword(password)
-
-  await AppDataSource.manager.save(user)
-  return getUser({ username })
+  return userRepo.save(user)
 }
 
 async function ensureInitialized(): Promise<void> {

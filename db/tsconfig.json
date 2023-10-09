@@ -26,7 +26,8 @@
     "types": ["node"],
     "declarationDir": "./dist/types", // Specify where declarations are output
     "declarationMap": true, // Generate source maps for .d.ts files
-    "sourceMap": true // Generate source maps for .js files
+    "sourceMap": true, // Generate source maps for .js files
+    "lib": ["ES6"]
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]

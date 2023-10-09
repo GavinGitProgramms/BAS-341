@@ -3,14 +3,18 @@ import {
   CreateDateColumn,
   Entity,
   Index,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
 import { UserType } from './Enums'
 
-@Entity({ name: 'user' })
+@Entity({ schema: 'public', name: 'user' })
 export class User {
-  @PrimaryColumn({ unique: true })
+  @PrimaryGeneratedColumn('uuid')
+  id: string
+
+  @Index({ unique: true })
+  @Column()
   username: string
 
   @Column({

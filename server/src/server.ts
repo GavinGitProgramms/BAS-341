@@ -1,6 +1,7 @@
 import bodyParser from 'body-parser'
 import express from 'express'
 import session from 'express-session'
+import 'reflect-metadata'
 import { v4 } from 'uuid'
 import appointmentRouter from './routers/appointment.router'
 import authRouter from './routers/auth.router'
