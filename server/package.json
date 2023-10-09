@@ -4,7 +4,7 @@
   "description": "the web api for bas",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/server.ts",
+    "start": "ts-node --files src/server.ts",
     "build": "tsc",
     "check": "tsc --noEmit",
     "serve": "node dist/server.js",
