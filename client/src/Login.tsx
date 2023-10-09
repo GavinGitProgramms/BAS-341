@@ -18,6 +18,7 @@ const Login = () => {
     setErrMsg('')
   }, [user, pwd])
 
+  /**Need to send data to db/serverside */
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
     console.log(user, pwd)

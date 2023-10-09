@@ -1,7 +1,7 @@
 import { match } from 'assert'
 import { useRef, useState, useEffect } from 'react'
 
-const RegisterUser = () => {
+const RegisterService = () => {
   const userRef: any = useRef()
   const errRef: any = useRef()
 
@@ -16,6 +16,9 @@ const RegisterUser = () => {
   const [matchPwd, setMatchPwd] = useState('')
   const [validMatch, setValidMatch] = useState(false)
   const [matchFocus, setMatchFocus] = useState(false)
+
+  const [qualifications, setQualifications] = useState('')
+  const [qualFocus, setQualFocus] = useState(false)
 
   const [errMsg, setErrMsg] = useState('')
   const [success, setSuccess] = useState(false)
@@ -58,7 +61,7 @@ const RegisterUser = () => {
       >
         {errMsg}
       </p>
-      <h1>Register User Account</h1>
+      <h1>Register Service Provider Account</h1>
       <form onSubmit={handleSubmit}>
         <label htmlFor="username">Username:</label>
         <input
@@ -118,6 +121,19 @@ const RegisterUser = () => {
           Must match the frist password input field.
         </p>
 
+        <label htmlFor="serviceType">Service Type</label>
+
+        <label htmlFor="qualifications">Qualifications:</label>
+        <input
+          type="qualification"
+          id="qualification"
+          onChange={(e) => setQualifications(e.target.value)}
+          required
+          onFocus={() => setQualFocus(true)}
+          onBlur={() => setQualFocus(false)}
+        />
+        <br />
+
         <button
           disabled={!validName || !validPwd || !validMatch ? true : false}
         >
@@ -125,10 +141,10 @@ const RegisterUser = () => {
         </button>
       </form>
       <p>
-        Need a Service Provider Account?
+        Need a User Account?
         <br />
         <span className="line">
-          {/*put router here to registerservice*/}
+          {/*put router here to registerUser*/}
           <a href="#">Sign Up</a>
         </span>
       </p>
@@ -144,4 +160,4 @@ const RegisterUser = () => {
   )
 }
 
-export default RegisterUser
+export default RegisterService
