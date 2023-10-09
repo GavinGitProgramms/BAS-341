@@ -125,8 +125,8 @@ const RegisterService = () => {
 
         <label htmlFor="qualifications">Qualifications:</label>
         <input
-          type="qualification"
-          id="qualification"
+          type="text"
+          id="qualifications"
           onChange={(e) => setQualifications(e.target.value)}
           required
           onFocus={() => setQualFocus(true)}
@@ -145,7 +145,7 @@ const RegisterService = () => {
         <br />
         <span className="line">
           {/*put router here to registerUser*/}
-          <a href="#">Sign Up</a>
+          <a href="/registeruser">Sign Up</a>
         </span>
       </p>
       <p>
@@ -153,7 +153,7 @@ const RegisterService = () => {
         <br />
         <span className="line">
           {/*put router here to sign in*/}
-          <a href="#">Sign In</a>
+          <a href="/">Sign In</a>
         </span>
       </p>
     </section>

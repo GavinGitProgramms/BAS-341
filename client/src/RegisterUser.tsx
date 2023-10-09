@@ -128,16 +128,14 @@ const RegisterUser = () => {
         Need a Service Provider Account?
         <br />
         <span className="line">
-          {/*put router here to registerservice*/}
-          <a href="#">Sign Up</a>
+          <a href="/registerservice">Sign Up</a>
         </span>
       </p>
       <p>
         Already have an account?
         <br />
         <span className="line">
-          {/*put router here to sign in*/}
-          <a href="#">Sign In</a>
+          <a href="/">Sign In</a>
         </span>
       </p>
     </section>
