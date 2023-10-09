@@ -14,11 +14,6 @@ export default {
       file: 'dist/bundle.cjs.js',
       format: 'cjs',
     },
-    {
-      file: 'dist/bundle.umd.js',
-      name: 'bas-db',
-      format: 'umd',
-    },
   ],
   plugins: [
     typescript(),

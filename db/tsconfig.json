@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ES6",
+    "target": "ES2022",
+    "module": "ES2022",
     "declaration": true, // Generate .d.ts declaration files
     "outDir": "./dist",
     "rootDir": "./src",
@@ -9,7 +9,10 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -19,7 +22,7 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,
-    "strictPropertyInitialization": true,
+    "strictPropertyInitialization": false,
     "types": ["node"],
     "declarationDir": "./dist/types", // Specify where declarations are output
     "declarationMap": true, // Generate source maps for .d.ts files

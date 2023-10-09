@@ -1,1 +1,1 @@
-export { foo } from './utils'
+export * from './user.utils'
