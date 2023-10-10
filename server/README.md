@@ -236,14 +236,13 @@ curl -s -X POST http://localhost:3000/appointment \
 **Body Parameters**:
 
 - `id`: The ID of the appointment.
-- `user`: The user associated with the appointment.
 
 **Sample `curl` Command**:
 
 ```bash
 curl -s -X POST http://localhost:3000/appointment/book \
      -H "Content-Type: application/json" \
-     -d '{"id": "12345", "user": "testUser"}' \
+     -d '{"id": "12345"}' \
      -b cookies.txt
 ```
 
