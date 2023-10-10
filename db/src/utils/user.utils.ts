@@ -1,7 +1,12 @@
-import { CreateUserArgs, GetUserArgs } from '../types'
-import { User, UserType, Qualification } from '../entity'
-import { AppDataSource } from '../data-source'
 import { createHash } from 'node:crypto'
+import { AppDataSource } from '../data-source'
+import { Qualification, User, UserType } from '../entity'
+import type {
+  CreateQualificationArgs,
+  CreateUserArgs,
+  GetUserArgs,
+} from '../types'
+import { ensureInitialized } from './db.utils'
 
 /**
  * Hashes a password using the SHA256 algorithm.
@@ -72,9 +77,18 @@ export async function createUser({
   const userRepo = AppDataSource.getRepository(User)
   const user = new User()
   user.username = username
+
+  // Validate the user type
+  if (!Object.values(UserType).includes(type)) {
+    throw new Error('invalid user type')
+  }
+
   user.type = type
+
   user.first_name = first_name
   user.last_name = last_name
+
+  // TODO: validate email and phone number with regex
   user.email = email
   user.phone_number = phone_number
   user.password_hash = hashPassword(password)
@@ -82,26 +96,26 @@ export async function createUser({
 }
 
 /**
- * Creates a new qualification with the given description and user.
+ * Creates a new qualification and saves it to the database.
  *
- * @param description The description of the qualification.
- * @param user The user associated with the qualification. Can be either a User object or a string representing the user's username.
- * @returns A Promise that resolves to the newly created Qualification object, or null if the user does not exist.
+ * @param {CreateQualificationArgs} args - The arguments needed to create a new qualification.
+ * @returns {Promise<Qualification | null>} - The newly created qualification or null if the user does not exist.
  */
-export async function createQualification(
-  description: string,
-  user: User | string,
-): Promise<Qualification | null> {
+export async function createQualification({
+  description,
+  user,
+}: CreateQualificationArgs): Promise<Qualification | null> {
   await ensureInitialized()
 
   const qualificationRepo = AppDataSource.getRepository(Qualification)
   const qualification = new Qualification()
   qualification.description = description
 
+  // If the user is a string, then we need to retrieve the user entity from the database.
   if (typeof user === 'string') {
     const userEntity = await getUser({ username: user })
     if (!userEntity) {
-      return null
+      throw new Error(`user: '${user}' does not exist`)
     }
     qualification.user = userEntity
   } else {
@@ -109,17 +123,4 @@ export async function createQualification(
   }
 
   return qualificationRepo.save(qualification)
-}
-
-/**
- * Ensures that the AppDataSource is initialized before proceeding with the function execution.
- *
- * If the AppDataSource is not initialized, it will be initialized before continuing.
- *
- * @returns Promise that resolves when the AppDataSource is initialized.
- */
-async function ensureInitialized(): Promise<void> {
-  if (!AppDataSource.isInitialized) {
-    await AppDataSource.initialize()
-  }
 }
