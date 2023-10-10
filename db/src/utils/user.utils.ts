@@ -34,6 +34,29 @@ export async function getUser({ username }: GetUserArgs): Promise<User | null> {
 }
 
 /**
+ * Expands the given user to a full User entity.
+ *
+ * If the user is already a User entity, it is returned as is.
+ * If the user is a string, it is used to retrieve the corresponding User entity from the database.
+ *
+ * @param user - The user to expand, either a User entity or a string representing the username.
+ * @returns A Promise that resolves to the expanded User entity.
+ * @throws An error if the user is a string and no corresponding User entity is found in the database.
+ */
+export async function expandUser(user: User | string): Promise<User> {
+  // If the user is a string, then we need to retrieve the user entity from the database.
+  if (typeof user === 'string') {
+    const userEntity = await getUser({ username: user })
+    if (!userEntity) {
+      throw new Error(`user: '${user}' does not exist`)
+    }
+    return userEntity
+  } else {
+    return user
+  }
+}
+
+/**
  * Checks if the provided credentials are valid for a user.
  *
  * @param username - The username of the user.
@@ -106,21 +129,9 @@ export async function createQualification({
   user,
 }: CreateQualificationArgs): Promise<Qualification | null> {
   await ensureInitialized()
-
   const qualificationRepo = AppDataSource.getRepository(Qualification)
   const qualification = new Qualification()
   qualification.description = description
-
-  // If the user is a string, then we need to retrieve the user entity from the database.
-  if (typeof user === 'string') {
-    const userEntity = await getUser({ username: user })
-    if (!userEntity) {
-      throw new Error(`user: '${user}' does not exist`)
-    }
-    qualification.user = userEntity
-  } else {
-    qualification.user = user
-  }
-
+  qualification.user = await expandUser(user)
   return qualificationRepo.save(qualification)
 }

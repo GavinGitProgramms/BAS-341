@@ -1,3 +1,4 @@
+import { FindOptionsWhere, IsNull } from 'typeorm'
 import { AppDataSource } from '../data-source'
 import { Appointment, AppointmentType, UserType } from '../entity'
 import type {
@@ -7,55 +8,59 @@ import type {
   SearchAppointmentsArgs,
 } from '../types'
 import { ensureInitialized } from './db.utils'
-import { getUser } from './user.utils'
+import { expandUser } from './user.utils'
 
 /**
- * Retrieves an appointment by ID.
+ * Retrieves an appointment by ID and user (if provided).
  *
- * @param {GetAppointmentArgs} args - The arguments for retrieving an appointment.
- * @returns {Promise<Appointment | null>} - A promise that resolves with the appointment or null if not found.
+ * @param {GetAppointmentArgs} args - The arguments for retrieving the appointment.
+ * @returns {Promise<Appointment | null>} - The retrieved appointment, or null if not found.
  */
 export async function getAppointment({
   id,
+  user,
 }: GetAppointmentArgs): Promise<Appointment | null> {
   await ensureInitialized()
   const appointmentRepo = AppDataSource.getRepository(Appointment)
-  const appointment = await appointmentRepo.findOneBy({ id })
+  const appointment = await (user
+    ? appointmentRepo.findOneBy({ id, user: await expandUser(user) })
+    : appointmentRepo.findOneBy({ id }))
   return appointment
 }
 
 /**
- * Searches for appointments based on the provided user.
+ * Searches for appointments based on the provided arguments.
  *
- * If the user is a string, it retrieves the user entity from the database.
- * If the user is a regular user, it searches by the user field.
- * Otherwise, it searches by the provider field.
+ * If the includeAllUnbooked argument is true, then all unbooked appointments
+ * for all service providers are returned in addition to the appointments for
+ * the given user.
  *
- * @param {SearchAppointmentsArgs} args - The arguments for the search.
+ * @param {SearchAppointmentsArgs} args - The arguments to use for the search.
  * @returns {Promise<Appointment[]>} - A promise that resolves to an array of appointments.
- * @throws {Error} - If the user does not exist in the database.
  */
 export async function searchAppointments({
   user,
+  includeAllUnbooked = false,
 }: SearchAppointmentsArgs): Promise<Appointment[]> {
   await ensureInitialized()
   const appointmentRepo = AppDataSource.getRepository(Appointment)
+  const whereOptions: Array<FindOptionsWhere<Appointment>> = []
 
-  // If the user is a string, then we need to retrieve the user entity from the database.
-  if (typeof user === 'string') {
-    const userEntity = await getUser({ username: user })
-    if (!userEntity) {
-      throw new Error(`user: '${user}' does not exist`)
-    }
-    user = userEntity
+  if (includeAllUnbooked) {
+    // Get all unbooked appointments for all service providers
+    whereOptions.push({ user: IsNull() })
   }
+
+  // Get all appointments for the user
+  user = await expandUser(user)
 
   // If the user is a regular user, then we need to search by the user field.
   // Otherwise, we need to search by the provider field.
-  const findByArgs =
-    user.type === UserType.REGULAR ? { user } : { provider: user }
+  whereOptions.push(
+    user.type === UserType.REGULAR ? { user } : { provider: user },
+  )
 
-  const appointments = await appointmentRepo.findBy(findByArgs)
+  const appointments = await appointmentRepo.find({ where: whereOptions })
   return appointments
 }
 
@@ -84,17 +89,7 @@ export async function createAppointment({
   }
 
   appointment.type = type
-
-  // If the provider is a string, then we need to retrieve the user entity from the database.
-  if (typeof provider === 'string') {
-    const userEntity = await getUser({ username: provider })
-    if (!userEntity) {
-      throw new Error(`user: '${provider}' does not exist`)
-    }
-    appointment.provider = userEntity
-  } else {
-    appointment.provider = provider
-  }
+  appointment.provider = await expandUser(provider)
 
   // Only service providers can create appointments
   if (appointment.provider.type !== UserType.SERVICE_PROVIDER) {
@@ -137,16 +132,7 @@ export async function bookAppointment({
     )
   }
 
-  // If the user is a string, then we need to retrieve the user entity from the database.
-  if (typeof user === 'string') {
-    const userEntity = await getUser({ username: user })
-    if (!userEntity) {
-      throw new Error(`user: '${user}' does not exist`)
-    }
-    appointment.user = userEntity
-  } else {
-    appointment.user = user
-  }
+  appointment.user = await expandUser(user)
 
   // Only service providers can create appointments
   if (appointment.provider.type !== UserType.REGULAR) {

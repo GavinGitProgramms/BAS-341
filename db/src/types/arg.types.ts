@@ -35,6 +35,11 @@ export type CreateQualificationArgs = {
  */
 export type GetAppointmentArgs = {
   id: string
+
+  /**
+   * Optional user to restrict the search to.
+   */
+  user?: User | string
 }
 
 /**
@@ -45,6 +50,12 @@ export type SearchAppointmentsArgs = {
    * The user to search for appointments.
    */
   user: User | string
+
+  /**
+   * Whether to include all appointments that have not been booked from
+   * all of the service providers.
+   */
+  includeAllUnbooked?: boolean
 }
 
 /**
