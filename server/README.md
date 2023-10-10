@@ -213,7 +213,6 @@ curl -s -X GET http://localhost:3000/appointment/$APPT_ID -b cookies.txt
 **Body Parameters**:
 
 - `type`: The type of appointment.
-- `provider`: The provider of the appointment.
 - `start_time`: The start time of the appointment.
 - `end_time`: The end time of the appointment.
 
