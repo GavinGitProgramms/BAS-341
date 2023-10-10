@@ -1,6 +1,12 @@
 import { match } from 'assert'
 import { useRef, useState, useEffect } from 'react'
 
+document.addEventListener('click', (e) => {
+  const isDropdownButton = (e.target as Element).matches(
+    '[data-dropdown-button]',
+  )
+})
+
 const RegisterService = () => {
   const userRef: any = useRef()
   const errRef: any = useRef()
@@ -19,6 +25,11 @@ const RegisterService = () => {
 
   const [qualifications, setQualifications] = useState('')
   const [qualFocus, setQualFocus] = useState(false)
+
+  const [firstname, setFirstname] = useState('')
+  const [lastname, setLastname] = useState('')
+  const [email, setEmail] = useState('')
+  const [phonenum, setPhonenum] = useState('')
 
   const [errMsg, setErrMsg] = useState('')
   const [success, setSuccess] = useState(false)
@@ -121,18 +132,50 @@ const RegisterService = () => {
           Must match the frist password input field.
         </p>
 
-        <label htmlFor="serviceType">Service Type</label>
-
-        <label htmlFor="qualifications">Qualifications:</label>
+        <label htmlFor="firstname">First Name:</label>
         <input
           type="text"
-          id="qualifications"
-          onChange={(e) => setQualifications(e.target.value)}
+          id="firstname"
+          onChange={(e) => setFirstname(e.target.value)}
           required
-          onFocus={() => setQualFocus(true)}
-          onBlur={() => setQualFocus(false)}
-        />
+        ></input>
         <br />
+        <label htmlFor="lastname">Last Name:</label>
+        <input
+          type="text"
+          id="lastname"
+          onChange={(e) => setLastname(e.target.value)}
+          required
+        ></input>
+        <br />
+        <label htmlFor="email">E-mail:</label>
+        <input
+          type="text"
+          id="email"
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        ></input>
+        <br />
+        <label htmlFor="phonenum">Phone Number:</label>
+        <input
+          type="text"
+          id="phonenum"
+          onChange={(e) => setPhonenum(e.target.value)}
+          required
+        ></input>
+        <br />
+
+        <label htmlFor="serviceType">Service Type:</label>
+        <div className="dropdown" data-dropdown>
+          <button className="link" data-dropdown-button>
+            Service Type
+          </button>
+          <div className="dropdown-menu">
+            <option>Fitness</option>
+            <option>Beauty</option>
+            <option>Medical</option>
+          </div>
+        </div>
 
         <button
           disabled={!validName || !validPwd || !validMatch ? true : false}
@@ -144,15 +187,13 @@ const RegisterService = () => {
         Need a User Account?
         <br />
         <span className="line">
-          {/*put router here to registerUser*/}
-          <a href="/registeruser">Sign Up</a>
+          <a href="/auth/register">Sign Up</a>
         </span>
       </p>
       <p>
         Already have an account?
         <br />
         <span className="line">
-          {/*put router here to sign in*/}
           <a href="/">Sign In</a>
         </span>
       </p>

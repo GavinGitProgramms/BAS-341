@@ -17,6 +17,11 @@ const RegisterUser = () => {
   const [validMatch, setValidMatch] = useState(false)
   const [matchFocus, setMatchFocus] = useState(false)
 
+  const [firstname, setFirstname] = useState('')
+  const [lastname, setLastname] = useState('')
+  const [email, setEmail] = useState('')
+  const [phonenum, setPhonenum] = useState('')
+
   const [errMsg, setErrMsg] = useState('')
   const [success, setSuccess] = useState(false)
 
@@ -115,9 +120,42 @@ const RegisterUser = () => {
           id="confirmnote"
           className={matchFocus && !validMatch ? 'instructions' : 'offscreen'}
         >
-          Must match the frist password input field.
+          Must match the first password input field.
         </p>
 
+        <br />
+        <label htmlFor="firstname">First Name:</label>
+        <input
+          type="text"
+          id="firstname"
+          onChange={(e) => setFirstname(e.target.value)}
+          required
+        ></input>
+        <br />
+        <label htmlFor="lastname">Last Name:</label>
+        <input
+          type="text"
+          id="lastname"
+          onChange={(e) => setLastname(e.target.value)}
+          required
+        ></input>
+        <br />
+        <label htmlFor="email">E-mail:</label>
+        <input
+          type="text"
+          id="email"
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        ></input>
+        <br />
+        <label htmlFor="phonenum">Phone Number:</label>
+        <input
+          type="text"
+          id="phonenum"
+          onChange={(e) => setPhonenum(e.target.value)}
+          required
+        ></input>
+        <br />
         <button
           disabled={!validName || !validPwd || !validMatch ? true : false}
         >
