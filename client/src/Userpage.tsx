@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, SetStateAction } from 'react'
 import axios from './api/axios'
 import { Appointment, User } from './types/entity.types'
 import { AppointmentDisplay } from './components/AppointmentDisplay'
@@ -12,10 +12,16 @@ const Userpage = () => {
 
   useEffect(() => {
     try {
-      axios.get<User>(USER_URL).then((res) => setUser(res.data))
+      axios
+        .get<User>(USER_URL)
+        .then((res: { data: SetStateAction<User | undefined> }) =>
+          setUser(res.data),
+        )
       axios
         .get<Appointment[]>(APPOINT_URL)
-        .then((res) => setAppointment(res.data))
+        .then((res: { data: SetStateAction<Appointment[] | undefined> }) =>
+          setAppointment(res.data),
+        )
     } catch (err) {}
   }, [])
 

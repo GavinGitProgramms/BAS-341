@@ -34,6 +34,7 @@ const Login = () => {
           withCredentials: true,
         },
       )
+      console.log(response)
       setUser('')
       setPwd('')
     } catch (err) {
