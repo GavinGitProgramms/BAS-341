@@ -1,28 +1,21 @@
 import { Request, Response, Router } from 'express'
-import { StatusCodes } from 'http-status-codes'
-import { getUsernameFromSession } from '../utils'
+import { ensureAuthenticated } from '../middleware'
 
 /**
  * Handles the GET request to retrieve appointments for a specific user.
+ *
+ * Requires an authenticated user for access.
  *
  * @param req - The request object.
  * @param res - The response object.
  * @returns A JSON response with the appointments array.
  */
 async function appointmentsHandler(req: Request, res: Response) {
-  const username = getUsernameFromSession(req)
-  if (!username) {
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json({ message: 'Unauthorized access' })
-  }
-
   // TODO: Search appointments by username
-
   res.json({ appointments: [] })
 }
 
 const router = Router()
-router.get('/', appointmentsHandler)
+router.get('/', ensureAuthenticated, appointmentsHandler)
 
 export default router

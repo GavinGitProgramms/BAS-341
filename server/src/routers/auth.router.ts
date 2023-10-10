@@ -1,13 +1,13 @@
 import {
-  checkCredentials,
-  createUser,
   CreateUserArgs,
   UserType,
+  checkCredentials,
+  createUser,
   getUser,
 } from 'bas-db'
 import { Request, Response, Router } from 'express'
-import { StatusCodes } from 'http-status-codes'
-import { getUsernameFromSession } from '../utils'
+import { ensureAuthenticated } from '../middleware'
+import { badRequest, internalErrorRequest, unauthorizedRequest } from '../utils'
 
 /**
  * Handles the registration of a new user.
@@ -22,27 +22,22 @@ async function registerHandler(req: Request<CreateUserArgs>, res: Response) {
   // TODO: validate the input better
   if (createUserArgs.type === UserType.ADMIN) {
     // Admin users can't be created from the client
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json({ message: 'Unauthorized access' })
+    return unauthorizedRequest(res)
   }
 
   try {
     const user = await createUser(createUserArgs)
     if (!user) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: 'Failed to register' })
+      return badRequest(res, 'Failed to register')
     }
 
     req.session.username = user.username
+    req.session.type = user.type
     res.json({ message: 'Registered successfully' })
   } catch (err) {
     const errMsg = `failed to register user: '${createUserArgs.username}', because: ${err}`
     console.error(errMsg)
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ message: 'Failed to register' })
+    return badRequest(res, 'Failed to register')
   }
 }
 
@@ -58,12 +53,11 @@ async function loginHandler(req: Request, res: Response) {
 
   const user = await checkCredentials(username, password)
   if (!user) {
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json({ message: 'Invalid username or password' })
+    return unauthorizedRequest(res)
   }
 
   req.session.username = user.username
+  req.session.type = user.type
   res.json({ message: 'Logged in successfully' })
 }
 
@@ -77,9 +71,7 @@ async function loginHandler(req: Request, res: Response) {
 async function logoutHandler(req: Request, res: Response) {
   req.session!.destroy((err) => {
     if (err) {
-      return res
-        .status(500)
-        .json({ message: 'Could not log out, please try again' })
+      return internalErrorRequest(res, 'Could not log out, please try again')
     }
     res.clearCookie('connect.sid') // Clear the session cookie
     res.json({ message: 'Logged out successfully' })
@@ -89,23 +81,17 @@ async function logoutHandler(req: Request, res: Response) {
 /**
  * Handles requests for user data.
  *
+ * Requires an authenticated user for access.
+ *
  * @param req - The request object.
  * @param res - The response object.
  * @returns The user data if the request is authorized and the user exists, otherwise an error message.
  */
 async function userHandler(req: Request, res: Response) {
-  const username = getUsernameFromSession(req)
-  if (!username) {
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json({ message: 'Unauthorized access' })
-  }
-
+  const { username } = req.user!
   const user = await getUser({ username })
   if (!user) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ message: 'No user data was found' })
+    return badRequest(res, 'No user data was found')
   }
 
   return res.json({
@@ -121,7 +107,7 @@ async function userHandler(req: Request, res: Response) {
 const router = Router()
 router.post('/register', registerHandler)
 router.post('/login', loginHandler)
-router.get('/logout', logoutHandler)
-router.get('/user', userHandler)
+router.get('/logout', ensureAuthenticated, logoutHandler)
+router.get('/user', ensureAuthenticated, userHandler)
 
 export default router

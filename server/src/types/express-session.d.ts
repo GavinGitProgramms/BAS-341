@@ -1,8 +1,16 @@
-import session from 'express-session'
+import 'express-session'
+import { UserSession } from './auth.types'
 
 declare module 'express-session' {
-  export interface SessionData {
-    // add your session properties here, for instance:
-    username?: string
+  export interface SessionData extends Partial<UserSession> {}
+}
+
+export {}
+
+declare global {
+  namespace Express {
+    export interface Request {
+      user?: UserSession
+    }
   }
 }

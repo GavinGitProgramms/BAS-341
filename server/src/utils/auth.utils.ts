@@ -1,16 +1,17 @@
 import { Request } from 'express'
+import { UserSession } from '../types'
 
 /**
- * Returns the username from the session object in the request.
+ * Returns the user session object from the request object.
  *
  * @param req - The request object.
- * @returns The username string if it exists in the session object, otherwise undefined.
+ * @returns The user session object or null if the session is invalid.
  */
-export function getUsernameFromSession(req: Request): string | undefined {
-  const session = req.session as any
-  if (!session) {
-    return undefined
+export function getUserSession(req: Request): UserSession | null {
+  const session = req.session
+  if (!session || !session.username || !session.type) {
+    return null
   }
 
-  return session.username
+  return { username: session.username, type: session.type }
 }
