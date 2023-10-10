@@ -1,8 +1,9 @@
 import React from 'react'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, SetStateAction } from 'react'
 import axios from './api/axios'
-import './types/entity.types'
+import { Appointment, User } from './types/entity.types'
 
+const USER_URL = '/auth/user'
 const LOGIN_URL = '/auth/login'
 
 const Login = () => {
@@ -12,7 +13,9 @@ const Login = () => {
   const [user, setUser] = useState('')
   const [pwd, setPwd] = useState('')
   const [errMsg, setErrMsg] = useState('')
-  const [success, setSuccess] = useState('')
+  const [success, setSuccess] = useState(false)
+  const [type, setType] = useState<User>()
+  const [anchor, setAnchor] = useState('/userhomepage')
 
   useEffect(() => {
     userRef.current.focus()
@@ -37,6 +40,7 @@ const Login = () => {
       console.log(response)
       setUser('')
       setPwd('')
+      setSuccess(true)
     } catch (err) {
       setErrMsg('Invalid Credentials')
     }
@@ -49,7 +53,7 @@ const Login = () => {
           <h1>You are logged in!</h1>
           <br />
           <p>
-            <a href="#">Go to Home</a>
+            <a href={anchor}>Go to Home</a>
           </p>
         </section>
       ) : (

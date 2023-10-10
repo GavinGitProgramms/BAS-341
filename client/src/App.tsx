@@ -7,6 +7,7 @@ import { Route, Routes } from 'react-router'
 import './types/entity.types'
 import Userpage from './Userpage'
 import Servicepage from './Servicepage'
+import NewAppointment from './NewAppointment'
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/registerservice" element={<RegisterService />} />
         <Route path="/userhomepage" element={<Userpage />} />
         <Route path="/servicepage" element={<Servicepage />} />
+        <Route path="/servicepage/newslot" element={<NewAppointment />} />
       </Routes>
     </>
   )
