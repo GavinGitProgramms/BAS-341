@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser'
+import cors from 'cors'
 import express from 'express'
 import session from 'express-session'
 import 'reflect-metadata'
@@ -10,6 +11,8 @@ import providerRouter from './routers/provider.router'
 const app = express()
 
 const PORT = process.env.PORT || 3000
+
+app.use(cors())
 
 // Parse JSON bodies (as sent by API clients)
 app.use(bodyParser.json())
