@@ -12,7 +12,12 @@ const app = express()
 
 const PORT = process.env.PORT || 3000
 
-app.use(cors())
+app.use(
+  cors({
+    credentials: true,
+    origin: 'http://localhost:3001,http://localhost:3000',
+  }),
+)
 
 // Parse JSON bodies (as sent by API clients)
 app.use(bodyParser.json())
