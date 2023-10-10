@@ -36,7 +36,9 @@ const Login = () => {
       )
       setUser('')
       setPwd('')
-    } catch (err) {}
+    } catch (err) {
+      setErrMsg('Invalid Credentials')
+    }
   }
 
   return (
