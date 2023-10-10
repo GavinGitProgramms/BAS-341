@@ -3,7 +3,6 @@ import {
   CreateDateColumn,
   Entity,
   Index,
-  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -54,7 +53,14 @@ export class User {
   @Column()
   password_hash: string
 
-  @OneToMany(() => Qualification, (qualification) => qualification.user)
+  @OneToMany(() => Appointment, (appointment) => appointment.user, {
+    cascade: true,
+  })
+  appointments: Appointment[]
+
+  @OneToMany(() => Qualification, (qualification) => qualification.user, {
+    cascade: true,
+  })
   qualifications: Qualification[]
 
   @CreateDateColumn()
@@ -76,11 +82,9 @@ export class Appointment {
   type: AppointmentType
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'provider_id' })
   provider: User
 
   @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'user_id' })
   user: User | null
 
   @Column({ type: 'timestamp' })
@@ -105,6 +109,5 @@ export class Qualification {
   description: string
 
   @ManyToOne(() => User, (user) => user.qualifications)
-  @JoinColumn({ name: 'user_id' })
   user: User
 }

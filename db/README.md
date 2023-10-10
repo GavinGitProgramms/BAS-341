@@ -27,7 +27,7 @@ docker-compose up -d
 ### Apply all Migrations to the Database
 
 ```
-npm run typeorm migration:run -- -d ./dist/bundle.cjs.js
+npm run typeorm migration:run -- -d ./dist/index.js
 ```
 
 ## Managing Database Migrations
@@ -36,6 +36,6 @@ npm run typeorm migration:run -- -d ./dist/bundle.cjs.js
 
 ```
 npm run prepare
-npm run typeorm migration:generate -- -d ./dist/bundle.cjs.js ./src/migration/Migration
+npm run typeorm migration:generate -- -d ./dist/index.js ./src/migration/Migration
 npm run format
 ```
