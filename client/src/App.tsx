@@ -4,6 +4,9 @@ import Login from './Login'
 import RegisterUser from './RegisterUser'
 import RegisterService from './RegisterService'
 import { Route, Routes } from 'react-router'
+import './types/entity.types'
+import Userpage from './Userpage'
+import Servicepage from './Servicepage'
 
 function App() {
   return (
@@ -12,6 +15,8 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/registeruser" element={<RegisterUser />} />
         <Route path="/registerservice" element={<RegisterService />} />
+        <Route path="/userhomepage" element={<Userpage />} />
+        <Route path="/servicehomepage" element={<Servicepage />} />
       </Routes>
     </>
   )

@@ -1,5 +1,9 @@
 import React from 'react'
 import { useRef, useState, useEffect } from 'react'
+import axios from './api/axios'
+import './types/entity.types'
+
+const LOGIN_URL = '/auth/login'
 
 const Login = () => {
   const userRef: any = useRef()
@@ -18,12 +22,21 @@ const Login = () => {
     setErrMsg('')
   }, [user, pwd])
 
-  /**Need to send data to db/serverside */
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
-    console.log(user, pwd)
-    setUser('')
-    setPwd('')
+
+    try {
+      const response = await axios.post(
+        LOGIN_URL,
+        JSON.stringify({ username: user, password: pwd }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true,
+        },
+      )
+      setUser('')
+      setPwd('')
+    } catch (err) {}
   }
 
   return (

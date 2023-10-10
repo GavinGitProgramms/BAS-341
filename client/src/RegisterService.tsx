@@ -1,5 +1,9 @@
 import { match } from 'assert'
 import { useRef, useState, useEffect } from 'react'
+import axios from './api/axios'
+import './types/entity.types'
+
+const REGISTER_URL = '/auth/register'
 
 document.addEventListener('click', (e) => {
   const isDropdownButton = (e.target as Element).matches(
@@ -11,11 +15,11 @@ const RegisterService = () => {
   const userRef: any = useRef()
   const errRef: any = useRef()
 
-  const [user, setUser] = useState('')
+  const [username, setUser] = useState('')
   const [validName, setValidName] = useState(false)
   const [userFocus, setUserFocus] = useState(false)
 
-  const [pwd, setPwd] = useState('')
+  const [password, setPwd] = useState('')
   const [validPwd, setValidPwd] = useState(false)
   const [pwdFocus, setPwdFocus] = useState(false)
 
@@ -26,10 +30,10 @@ const RegisterService = () => {
   const [qualifications, setQualifications] = useState('')
   const [qualFocus, setQualFocus] = useState(false)
 
-  const [firstname, setFirstname] = useState('')
-  const [lastname, setLastname] = useState('')
+  const [first_name, setFirstname] = useState('')
+  const [last_name, setLastname] = useState('')
   const [email, setEmail] = useState('')
-  const [phonenum, setPhonenum] = useState('')
+  const [phone_number, setPhonenum] = useState('')
 
   const [errMsg, setErrMsg] = useState('')
   const [success, setSuccess] = useState(false)
@@ -45,22 +49,46 @@ const RegisterService = () => {
   useEffect(() => {
     const result = true
     setValidName(result)
-  }, [user])
+  }, [username])
 
   useEffect(() => {
     const result = true
     setValidPwd(result)
-    const match = pwd === matchPwd
+    const match = password === matchPwd
     setValidMatch(match)
-  }, [pwd, matchPwd])
+  }, [password, matchPwd])
 
   useEffect(() => {
     setErrMsg('')
-  }, [user, pwd, matchPwd])
+  }, [username, password, matchPwd])
 
   const handleSubmit = async (e: any) => {
     e.preventDefault()
-    /** Send info to server side */
+    try {
+      const response = await axios.post(
+        REGISTER_URL,
+        JSON.stringify({
+          username,
+          type: 'SERVICE_PROVIDER',
+          first_name,
+          last_name,
+          email,
+          phone_number,
+          password,
+        }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true,
+        },
+      )
+      console.log(JSON.stringify(response))
+      setUser('')
+      setFirstname('')
+      setLastname('')
+      setEmail('')
+      setPhonenum('')
+      setPwd('')
+    } catch (err) {}
   }
 
   return (
@@ -90,12 +118,11 @@ const RegisterService = () => {
         <p
           id="uidnote"
           className={
-            userFocus && user && !validName ? 'instructions' : 'offscreen'
+            userFocus && username && !validName ? 'instructions' : 'offscreen'
           }
         >
           Username requirments here!!!
         </p>
-
         <label htmlFor="password">Password:</label>
         <input
           type="password"
@@ -113,7 +140,6 @@ const RegisterService = () => {
         >
           Password requirments here!!!
         </p>
-
         <label htmlFor="confirm_pwd">Confirm Password:</label>
         <input
           type="password"
@@ -131,19 +157,18 @@ const RegisterService = () => {
         >
           Must match the frist password input field.
         </p>
-
-        <label htmlFor="firstname">First Name:</label>
+        <label htmlFor="first_name">First Name:</label>
         <input
           type="text"
-          id="firstname"
+          id="first_name"
           onChange={(e) => setFirstname(e.target.value)}
           required
         ></input>
         <br />
-        <label htmlFor="lastname">Last Name:</label>
+        <label htmlFor="last_name">Last Name:</label>
         <input
           type="text"
-          id="lastname"
+          id="last_name"
           onChange={(e) => setLastname(e.target.value)}
           required
         ></input>
@@ -156,27 +181,14 @@ const RegisterService = () => {
           required
         ></input>
         <br />
-        <label htmlFor="phonenum">Phone Number:</label>
+        <label htmlFor="phone_number">Phone Number:</label>
         <input
           type="text"
-          id="phonenum"
+          id="phone_number"
           onChange={(e) => setPhonenum(e.target.value)}
           required
         ></input>
         <br />
-
-        <label htmlFor="serviceType">Service Type:</label>
-        <div className="dropdown" data-dropdown>
-          <button className="link" data-dropdown-button>
-            Service Type
-          </button>
-          <div className="dropdown-menu">
-            <option>Fitness</option>
-            <option>Beauty</option>
-            <option>Medical</option>
-          </div>
-        </div>
-
         <button
           disabled={!validName || !validPwd || !validMatch ? true : false}
         >
@@ -187,7 +199,7 @@ const RegisterService = () => {
         Need a User Account?
         <br />
         <span className="line">
-          <a href="/auth/register">Sign Up</a>
+          <a href="/registeruser">Sign Up</a>
         </span>
       </p>
       <p>
@@ -202,3 +214,16 @@ const RegisterService = () => {
 }
 
 export default RegisterService
+
+/*
+<label htmlFor="serviceType">Service Type:</label>
+<div className="dropdown" data-dropdown>
+  <button className="link" data-dropdown-button>
+    Service Type
+  </button>
+  <div className="dropdown-menu">
+    <option>Fitness</option>
+    <option>Beauty</option>
+    <option>Medical</option>
+  </div>
+</div> */
