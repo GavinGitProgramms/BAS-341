@@ -2,6 +2,7 @@ import { useRef, useState, useEffect, SetStateAction } from 'react'
 import axios from './api/axios'
 import { Appointment, User } from './types/entity.types'
 import { AppointmentDisplay } from './components/AppointmentDisplay'
+import { Logout } from './components/Logout'
 
 const USER_URL = '/auth/user'
 
@@ -32,6 +33,7 @@ const Servicepage = () => {
           <a href="/servicepage/newslot">New Slot</a>
         </span>
       </p>
+      <Logout />
     </>
   )
 }
