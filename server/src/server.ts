@@ -5,9 +5,11 @@ import 'reflect-metadata'
 import { v4 } from 'uuid'
 import appointmentRouter from './routers/appointment.router'
 import authRouter from './routers/auth.router'
+import providerRouter from './routers/provider.router'
 
 const app = express()
-const PORT = 3000
+
+const PORT = process.env.PORT || 3000
 
 // Parse JSON bodies (as sent by API clients)
 app.use(bodyParser.json())
@@ -24,6 +26,7 @@ app.use(
 
 app.use('/auth', authRouter)
 app.use('/appointment', appointmentRouter)
+app.use('/provider', providerRouter)
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`)

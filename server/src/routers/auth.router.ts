@@ -7,7 +7,12 @@ import {
 } from 'bas-db'
 import { Request, Response, Router } from 'express'
 import { ensureAuthenticated } from '../middleware'
-import { badRequest, internalErrorRequest, unauthorizedRequest } from '../utils'
+import {
+  badRequest,
+  internalErrorRequest,
+  unauthorizedRequest,
+  userDTO,
+} from '../utils'
 
 /**
  * Handles the registration of a new user.
@@ -79,13 +84,11 @@ async function logoutHandler(req: Request, res: Response) {
 }
 
 /**
- * Handles requests for user data.
- *
- * Requires an authenticated user for access.
+ * Handles the request to get user data for the authenticated user.
  *
  * @param req - The request object.
  * @param res - The response object.
- * @returns The user data if the request is authorized and the user exists, otherwise an error message.
+ * @returns A JSON response containing the user data.
  */
 async function userHandler(req: Request, res: Response) {
   const { username } = req.user!
@@ -94,14 +97,7 @@ async function userHandler(req: Request, res: Response) {
     return badRequest(res, 'No user data was found')
   }
 
-  return res.json({
-    username: user.username,
-    email: user.email,
-    type: user.type,
-    first_name: user.first_name,
-    last_name: user.last_name,
-    phone_number: user.phone_number,
-  })
+  return res.json(userDTO(user))
 }
 
 const router = Router()

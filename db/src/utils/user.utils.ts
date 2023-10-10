@@ -11,6 +11,8 @@ import { ensureInitialized } from './db.utils'
 /**
  * Hashes a password using the SHA256 algorithm.
  *
+ * NOTE: this is not secure and should be improved in a real product.
+ *
  * @param password - The password to hash.
  * @returns The hashed password as a hexadecimal string.
  */
@@ -29,7 +31,12 @@ export function hashPassword(password: string): string {
 export async function getUser({ username }: GetUserArgs): Promise<User | null> {
   await ensureInitialized()
   const userRepo = AppDataSource.getRepository(User)
-  const user = await userRepo.findOneBy({ username })
+  const user = await userRepo.findOne({
+    where: { username },
+    relations: {
+      qualifications: true,
+    },
+  })
   return user
 }
 
@@ -119,19 +126,28 @@ export async function createUser({
 }
 
 /**
- * Creates a new qualification and saves it to the database.
+ * Creates a new qualification for a service provider user.
+ *
+ * This is for use by service provider users only.
  *
  * @param {CreateQualificationArgs} args - The arguments needed to create a new qualification.
- * @returns {Promise<Qualification | null>} - The newly created qualification or null if the user does not exist.
+ * @returns {Promise<User | null>} - The updated user object with the new qualification.
+ * @throws {Error} - If the user is not a service provider.
  */
 export async function createQualification({
   description,
   user,
-}: CreateQualificationArgs): Promise<Qualification | null> {
+}: CreateQualificationArgs): Promise<User | null> {
   await ensureInitialized()
   const qualificationRepo = AppDataSource.getRepository(Qualification)
   const qualification = new Qualification()
   qualification.description = description
   qualification.user = await expandUser(user)
-  return qualificationRepo.save(qualification)
+
+  if (qualification.user.type !== UserType.SERVICE_PROVIDER) {
+    throw new Error('only service providers can have qualifications')
+  }
+
+  await qualificationRepo.save(qualification)
+  return getUser({ username: qualification.user.username })
 }

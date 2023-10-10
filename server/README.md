@@ -111,7 +111,7 @@ curl -s -X POST http://localhost:3000/auth/register \
 ```bash
 curl -s -X POST http://localhost:3000/auth/login \
      -H "Content-Type: application/json" \
-     -d '{"username": "test", "password": "letmein"}' \
+     -d '{"username": "testProvider", "password": "letmein"}' \
      -c cookies.txt
 ```
 
@@ -247,3 +247,10 @@ curl -s -X POST http://localhost:3000/appointment/book \
 ```
 
 > This command uses the session cookie from cookies.txt.
+
+```bash
+curl -s -X POST http://localhost:3000/provider/qualification \
+     -H "Content-Type: application/json" \
+     -d '{"description": "AWESOME"}' \
+     -b cookies.txt
+```

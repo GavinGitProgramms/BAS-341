@@ -5,6 +5,7 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
@@ -53,6 +54,9 @@ export class User {
   @Column()
   password_hash: string
 
+  @OneToMany(() => Qualification, (qualification) => qualification.user)
+  qualifications: Qualification[]
+
   @CreateDateColumn()
   created_date: Date
 
@@ -100,7 +104,7 @@ export class Qualification {
   @Column()
   description: string
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.qualifications)
   @JoinColumn({ name: 'user_id' })
   user: User
 }
