@@ -1,17 +1,15 @@
 {
   "name": "bas-db",
   "version": "0.1.0",
-  "type": "commonjs",
   "description": "database abstractions for bas",
-  "main": "dist/bundle.cjs.js",
-  "module": "dist/bundle.esm.js",
-  "types": "dist/index.d.ts",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
   "scripts": {
-    "build": "npm run clean && tsc",
-    "bundle": "rollup -c",
+    "build": "npm run clean && tsc -p tsconfig.json",
     "check": "tsc --noEmit",
     "clean": "rimraf dist",
-    "prepare": "npm run build && npm run bundle",
+    "prepare": "npm run build",
     "lint": "eslint . --ext .js,.ts",
     "lint:fix": "eslint . --ext .js,.ts --fix",
     "format": "prettier --write '{src,scripts}/**/*.{js,jsx,ts,tsx}'",
@@ -30,8 +28,6 @@
     "typescript": "^5.2.2"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^25.0.5",
-    "@rollup/plugin-node-resolve": "^15.2.2",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
     "eslint": "^8.51.0",
@@ -39,9 +35,6 @@
     "eslint-plugin-prettier": "^5.0.0",
     "prettier": "^3.0.3",
     "rimraf": "^5.0.5",
-    "rollup": "^2.79.1",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-typescript2": "^0.36.0",
     "ts-node": "^10.9.1"
   },
   "eslintConfig": {

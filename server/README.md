@@ -242,7 +242,7 @@ curl -s -X POST http://localhost:3000/appointment \
 ```bash
 curl -s -X POST http://localhost:3000/appointment/book \
      -H "Content-Type: application/json" \
-     -d '{"id": "12345"}' \
+     -d '{"id": "f3844432-be0e-4eb2-89f1-7efb7f566489"}' \
      -b cookies.txt
 ```
 

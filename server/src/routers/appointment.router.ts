@@ -9,7 +9,7 @@ import {
 } from 'bas-db'
 import { Request, Response, Router } from 'express'
 import { ensureAuthenticated } from '../middleware'
-import { badRequest, unauthorizedRequest } from '../utils'
+import { badRequest, notFoundRequest, unauthorizedRequest } from '../utils'
 
 /**
  * Handler function for retrieving all booked appointments for a user.
@@ -75,11 +75,19 @@ async function getBookedAppointmentHandler(req: Request, res: Response) {
   const { username } = req.user!
   const { appointmentId } = req.params
   try {
-    const appointments = await getAppointment({
+    const appointment = await getAppointment({
       id: appointmentId,
       user: username,
     })
-    res.json({ appointments })
+
+    if (!appointment) {
+      return notFoundRequest(res, 'Appointment not found')
+    }
+
+    // Make sure that the user and provider data is not returned
+    const { user, provider, ...resData } = appointment
+
+    res.json({ appointment: resData })
   } catch (err) {
     const errMsg = `failed to get booked appointment for user: '${username}', because: ${err}`
     console.error(errMsg)
@@ -133,7 +141,7 @@ async function createAppointmentHandler(
  * @returns The appointment details if successful, or an error message if failed.
  */
 async function bookAppointmentHandler(
-  req: Request<BookAppointmentArgs>,
+  req: Request<Omit<BookAppointmentArgs, 'user'>>,
   res: Response,
 ) {
   const { username, type } = req.user!
@@ -142,7 +150,11 @@ async function bookAppointmentHandler(
   }
 
   try {
-    const bookAppointmentArgs = req.body
+    const bookAppointmentArgs: BookAppointmentArgs = {
+      ...req.body,
+      user: username,
+    }
+
     const appointment = await bookAppointment(bookAppointmentArgs)
     res.json({ appointment })
   } catch (err) {

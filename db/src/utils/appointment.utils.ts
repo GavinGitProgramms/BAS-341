@@ -13,6 +13,8 @@ import { expandUser } from './user.utils'
 /**
  * Retrieves an appointment by ID and user (if provided).
  *
+ * Includes data for the associated user and provider.
+ *
  * @param {GetAppointmentArgs} args - The arguments for retrieving the appointment.
  * @returns {Promise<Appointment | null>} - The retrieved appointment, or null if not found.
  */
@@ -22,10 +24,29 @@ export async function getAppointment({
 }: GetAppointmentArgs): Promise<Appointment | null> {
   await ensureInitialized()
   const appointmentRepo = AppDataSource.getRepository(Appointment)
-  const appointment = await (user
-    ? appointmentRepo.findOneBy({ id, user: await expandUser(user) })
-    : appointmentRepo.findOneBy({ id }))
-  return appointment
+
+  const relations = {
+    user: true,
+    provider: true,
+  }
+
+  // Restrict the search to the given user if provided
+  if (user) {
+    user = await expandUser(user)
+    const relation = user.type === UserType.REGULAR ? 'user' : 'provider'
+    return appointmentRepo.findOne({
+      where: {
+        id,
+        [relation]: { id: user.id },
+      },
+      relations,
+    })
+  }
+
+  return appointmentRepo.findOne({
+    where: { id },
+    relations,
+  })
 }
 
 /**
@@ -51,16 +72,20 @@ export async function searchAppointments({
     whereOptions.push({ user: IsNull() })
   }
 
-  // Get all appointments for the user
   user = await expandUser(user)
 
   // If the user is a regular user, then we need to search by the user field.
   // Otherwise, we need to search by the provider field.
   whereOptions.push(
-    user.type === UserType.REGULAR ? { user } : { provider: user },
+    user.type === UserType.REGULAR
+      ? { user: { id: user.id } }
+      : { provider: { id: user.id } },
   )
 
-  const appointments = await appointmentRepo.find({ where: whereOptions })
+  const appointments = await appointmentRepo.find({
+    where: whereOptions,
+  })
+
   return appointments
 }
 
@@ -135,7 +160,7 @@ export async function bookAppointment({
   appointment.user = await expandUser(user)
 
   // Only service providers can create appointments
-  if (appointment.provider.type !== UserType.REGULAR) {
+  if (appointment.user.type !== UserType.REGULAR) {
     throw new Error('only regular users can book appointments')
   }
 

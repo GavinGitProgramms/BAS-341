@@ -1,4 +1,1 @@
-export * from './Appointments'
-export * from './Enums'
-export * from './User'
-export * from './Qualification'
+export * from './Entities'
