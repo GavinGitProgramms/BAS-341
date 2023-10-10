@@ -7,10 +7,6 @@ export default {
   input: 'src/index.ts',
   output: [
     {
-      file: 'dist/bundle.esm.js',
-      format: 'esm',
-    },
-    {
       file: 'dist/bundle.cjs.js',
       format: 'cjs',
     },

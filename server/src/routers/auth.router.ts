@@ -1,6 +1,13 @@
-import { checkCredentials, createUser, CreateUserArgs, UserType } from 'bas-db'
+import {
+  checkCredentials,
+  createUser,
+  CreateUserArgs,
+  UserType,
+  getUser,
+} from 'bas-db'
 import { Request, Response, Router } from 'express'
 import { StatusCodes } from 'http-status-codes'
+import { getUsernameFromSession } from '../utils'
 
 /**
  * Handles the registration of a new user.
@@ -20,17 +27,23 @@ async function registerHandler(req: Request<CreateUserArgs>, res: Response) {
       .json({ message: 'Unauthorized access' })
   }
 
-  // TODO: there will be extra logic for service provider users
+  try {
+    const user = await createUser(createUserArgs)
+    if (!user) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: 'Failed to register' })
+    }
 
-  const user = await createUser(createUserArgs)
-  if (!user) {
+    req.session.username = user.username
+    res.json({ message: 'Registered successfully' })
+  } catch (err) {
+    const errMsg = `failed to register user: '${createUserArgs.username}', because: ${err}`
+    console.error(errMsg)
     return res
       .status(StatusCodes.BAD_REQUEST)
       .json({ message: 'Failed to register' })
   }
-
-  req.session.username = user.username
-  res.json({ message: 'Registered successfully' })
 }
 
 /**
@@ -73,9 +86,42 @@ async function logoutHandler(req: Request, res: Response) {
   })
 }
 
+/**
+ * Handles requests for user data.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns The user data if the request is authorized and the user exists, otherwise an error message.
+ */
+async function userHandler(req: Request, res: Response) {
+  const username = getUsernameFromSession(req)
+  if (!username) {
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ message: 'Unauthorized access' })
+  }
+
+  const user = await getUser({ username })
+  if (!user) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ message: 'No user data was found' })
+  }
+
+  return res.json({
+    username: user.username,
+    email: user.email,
+    type: user.type,
+    first_name: user.first_name,
+    last_name: user.last_name,
+    phone_number: user.phone_number,
+  })
+}
+
 const router = Router()
 router.post('/register', registerHandler)
 router.post('/login', loginHandler)
 router.get('/logout', logoutHandler)
+router.get('/user', userHandler)
 
 export default router

@@ -1,5 +1,5 @@
 import { CreateUserArgs, GetUserArgs } from '../types'
-import { User, UserType } from '../entity'
+import { User, UserType, Qualification } from '../entity'
 import { AppDataSource } from '../data-source'
 import { createHash } from 'node:crypto'
 
@@ -81,6 +81,43 @@ export async function createUser({
   return userRepo.save(user)
 }
 
+/**
+ * Creates a new qualification with the given description and user.
+ *
+ * @param description The description of the qualification.
+ * @param user The user associated with the qualification. Can be either a User object or a string representing the user's username.
+ * @returns A Promise that resolves to the newly created Qualification object, or null if the user does not exist.
+ */
+export async function createQualification(
+  description: string,
+  user: User | string,
+): Promise<Qualification | null> {
+  await ensureInitialized()
+
+  const qualificationRepo = AppDataSource.getRepository(Qualification)
+  const qualification = new Qualification()
+  qualification.description = description
+
+  if (typeof user === 'string') {
+    const userEntity = await getUser({ username: user })
+    if (!userEntity) {
+      return null
+    }
+    qualification.user = userEntity
+  } else {
+    qualification.user = user
+  }
+
+  return qualificationRepo.save(qualification)
+}
+
+/**
+ * Ensures that the AppDataSource is initialized before proceeding with the function execution.
+ *
+ * If the AppDataSource is not initialized, it will be initialized before continuing.
+ *
+ * @returns Promise that resolves when the AppDataSource is initialized.
+ */
 async function ensureInitialized(): Promise<void> {
   if (!AppDataSource.isInitialized) {
     await AppDataSource.initialize()

@@ -122,7 +122,23 @@ curl -X GET http://localhost:3000/auth/logout -b cookies.txt
 
 > This command uses the session cookie from cookies.txt.
 
-### 4. Get Appointments
+### 4. Get User
+
+**URL**: `/auth/user`
+
+**Method**: GET
+
+**Description**: Handles the GET request to data for a specific user.
+
+**Sample `curl` Command**:
+
+```
+curl -X GET http://localhost:3000/auth/user -b cookies.txt
+```
+
+> This command uses the session cookie from cookies.txt.
+
+### 5. Get Appointments
 
 **URL**: `/appointment`
 
