@@ -10,7 +10,7 @@ import { getUserSession, unauthorizedRequest } from '../utils'
  * @returns If the user is not authenticated, returns an error response with status code 401 and message "Unauthorized access". Otherwise, sets the user session in the request object and calls the next middleware function.
  */
 export function ensureAuthenticated(
-  req: Request,
+  req: Request<any>,
   res: Response,
   next: NextFunction,
 ) {

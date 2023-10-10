@@ -16,7 +16,7 @@ export class Qualification {
   @Column()
   description: string
 
-  @ManyToOne(() => User, (user) => user.qualifications)
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: Relation<User>
 }

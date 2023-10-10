@@ -5,11 +5,8 @@ import {
   Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  Relation,
-  OneToMany,
 } from 'typeorm'
 import { UserType } from './Enums'
-import { Qualification } from './Qualification'
 
 @Entity({ schema: 'public', name: 'user' })
 export class User {
@@ -42,9 +39,6 @@ export class User {
 
   @Column()
   password_hash: string
-
-  @OneToMany(() => Qualification, (qualification) => qualification.user)
-  qualifications: Array<Relation<Qualification>>
 
   @CreateDateColumn()
   created_date: Date

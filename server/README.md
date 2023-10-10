@@ -71,12 +71,23 @@ npm start
 - `phone_number`: The phone number of the user.
 - `password`: The password for the user.
 
-**Sample `curl` Command**:
+**Sample `curl` Commands**:
+
+#### Create a Regular User
 
 ```bash
-curl -X POST http://localhost:3000/auth/register \
+curl -s -X POST http://localhost:3000/auth/register \
      -H "Content-Type: application/json" \
      -d '{"username": "test", "type": "REGULAR", "first_name": "Foo", "last_name": "Bar", "email": "foo@bar.com", "phone_number": "+1 608 781-8181", "password": "letmein"}' \
+     -c cookies.txt
+```
+
+#### Create a Service Provider User
+
+```bash
+curl -s -X POST http://localhost:3000/auth/register \
+     -H "Content-Type: application/json" \
+     -d '{"username": "testProvider", "type": "SERVICE_PROVIDER", "first_name": "Awesome", "last_name": "Services", "email": "awesome@services.com", "phone_number": "+1 608 742-4242", "password": "letmein"}' \
      -c cookies.txt
 ```
 
@@ -97,8 +108,8 @@ curl -X POST http://localhost:3000/auth/register \
 
 **Sample `curl` Command**:
 
-```
-curl -X POST http://localhost:3000/auth/login \
+```bash
+curl -s -X POST http://localhost:3000/auth/login \
      -H "Content-Type: application/json" \
      -d '{"username": "test", "password": "letmein"}' \
      -c cookies.txt
@@ -116,8 +127,8 @@ curl -X POST http://localhost:3000/auth/login \
 
 **Sample `curl` Command**:
 
-```
-curl -X GET http://localhost:3000/auth/logout -b cookies.txt
+```bash
+curl -s -X GET http://localhost:3000/auth/logout -b cookies.txt
 ```
 
 > This command uses the session cookie from cookies.txt.
@@ -132,24 +143,109 @@ curl -X GET http://localhost:3000/auth/logout -b cookies.txt
 
 **Sample `curl` Command**:
 
-```
-curl -X GET http://localhost:3000/auth/user -b cookies.txt
+```bash
+curl -s -X GET http://localhost:3000/auth/user -b cookies.txt
 ```
 
 > This command uses the session cookie from cookies.txt.
 
-### 5. Get Appointments
+### 5. Get Booked Appointments
 
 **URL**: `/appointment`
 
 **Method**: GET
 
-**Description**: Handles the GET request to retrieve appointments for a specific user.
+**Description**: Retrieves all booked appointments for a user. Requires an authenticated user for access. For use by regular users only.
 
 **Sample `curl` Command**:
 
+```bash
+curl -s -X GET http://localhost:3000/appointment -b cookies.txt
 ```
-curl -X GET http://localhost:3000/appointment -b cookies.txt
+
+> This command uses the session cookie from cookies.txt.
+
+### 6. Get All Appointments
+
+**URL**: `/appointment/all`
+
+**Method**: GET
+
+**Description**: Gets all appointments for a user, including all booked appointments for the particular user and all unbooked appointments for all service providers. Requires an authenticated user for access. For use by regular users only.
+
+**Sample `curl` Command**:
+
+```bash
+curl -s -X GET http://localhost:3000/appointment/all -b cookies.txt
+```
+
+> This command uses the session cookie from cookies.txt.
+
+### 7. Get Specific Booked Appointment
+
+**URL**: `/appointment/:appointmentId`
+
+**Method**: GET
+
+**Description**: Handles GET requests for a specific booked appointment by ID for a given user. Requires an authenticated user for access. For use by regular users only.
+
+**URL Parameters**:
+
+- `appointmentId`: ID of the appointment.
+
+**Sample `curl` Command**:
+
+```bash
+APPT_ID='0cc12562-a55c-4335-a10c-9ebc3e615902'
+curl -s -X GET http://localhost:3000/appointment/$APPT_ID -b cookies.txt
+```
+
+> This command uses the session cookie from cookies.txt.
+
+### 8. Create New Appointment
+
+**URL**: `/appointment`
+
+**Method**: POST
+
+**Description**: Creates a new appointment for a service provider. Requires an authenticated user for access. For use by service provider users only.
+
+**Body Parameters**:
+
+- `type`: The type of appointment.
+- `provider`: The provider of the appointment.
+- `start_time`: The start time of the appointment.
+- `end_time`: The end time of the appointment.
+
+**Sample `curl` Command**:
+
+```bash
+curl -s -X POST http://localhost:3000/appointment \
+     -H "Content-Type: application/json" \
+     -d '{"type": "MEDICAL", "start_time": "2023-10-10T10:00:00Z", "end_time": "2023-10-10T11:00:00Z"}' \
+     -b cookies.txt
+```
+
+### 9. Book an Appointment
+
+**URL**: `/appointment/book`
+
+**Method**: POST
+
+**Description**: Handles the request to book an appointment. Requires an authenticated user for access. For use by regular users only.
+
+**Body Parameters**:
+
+- `id`: The ID of the appointment.
+- `user`: The user associated with the appointment.
+
+**Sample `curl` Command**:
+
+```bash
+curl -s -X POST http://localhost:3000/appointment/book \
+     -H "Content-Type: application/json" \
+     -d '{"id": "12345", "user": "testUser"}' \
+     -b cookies.txt
 ```
 
 > This command uses the session cookie from cookies.txt.
