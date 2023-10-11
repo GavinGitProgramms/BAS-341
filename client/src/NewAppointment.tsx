@@ -35,7 +35,7 @@ const NewAppointment = () => {
           start_time,
           end_time,
           description,
-          provider: user?.username,
+          provider: user,
         }),
         {
           headers: { 'Content-Type': 'application/json' },

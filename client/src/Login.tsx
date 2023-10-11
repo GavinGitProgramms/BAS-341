@@ -1,7 +1,8 @@
 import React from 'react'
 import { useRef, useState, useEffect, SetStateAction } from 'react'
 import axios from './api/axios'
-import { Appointment, User } from './types/entity.types'
+import { Appointment, User, UserType } from './types/entity.types'
+import { types } from 'util'
 
 const USER_URL = '/auth/user'
 const LOGIN_URL = '/auth/login'
@@ -14,8 +15,9 @@ const Login = () => {
   const [pwd, setPwd] = useState('')
   const [errMsg, setErrMsg] = useState('')
   const [success, setSuccess] = useState(false)
-  const [type, setType] = useState<User>()
-  const [anchor, setAnchor] = useState('/userhomepage')
+  const [profile, setProfile] = useState<User>()
+  const [type, setType] = useState<UserType>()
+  const [anchor, setAnchor] = useState('')
 
   useEffect(() => {
     userRef.current.focus()
@@ -27,6 +29,15 @@ const Login = () => {
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
+
+    const checkType = async (e: UserType | undefined) => {
+      console.log(type)
+      if (type === 'SERVICE_PROVIDER') {
+        setAnchor('/servicepage')
+      } else {
+        setAnchor('/userhomepage')
+      }
+    }
 
     try {
       const response = await axios.post(
@@ -41,6 +52,11 @@ const Login = () => {
       setUser('')
       setPwd('')
       setSuccess(true)
+      try {
+        axios.get<User>(USER_URL).then((res) => setType(res.data.type))
+      } catch (error) {
+        console.log('error here')
+      }
     } catch (err) {
       setErrMsg('Invalid Credentials')
     }

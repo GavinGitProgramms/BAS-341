@@ -5,10 +5,12 @@ import { AppointmentDisplayID } from './components/AppointmentDisplayID'
 
 const USER_URL = '/auth/user'
 const APPOINT_URL = '/appointment/all'
+const BOOK_URL = '/appointment/book'
 
 const BookAppointment = () => {
   const [user, setUser] = useState<User>()
   const [appointments, setAppointment] = useState<Appointment[]>()
+  const [appID, setAppID] = useState('')
 
   useEffect(() => {
     try {
@@ -22,6 +24,13 @@ const BookAppointment = () => {
         .then((res) => setAppointment(res.data?.appointments || []))
     } catch (err) {}
   }, [])
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault()
+    try {
+      const response = await axios.post(BOOK_URL, JSON.stringify({ id: appID }))
+    } catch (error) {}
+  }
 
   return (
     <>
@@ -39,6 +48,16 @@ const BookAppointment = () => {
           )
         })}
       </div>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="appointmentid">Appointment ID:</label>
+        <input
+          type="text"
+          id="appointmentid"
+          autoComplete="off"
+          onChange={(e) => setAppID(e.target.value)}
+        />
+        <button>Book</button>
+      </form>
     </>
   )
 }

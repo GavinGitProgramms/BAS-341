@@ -5,6 +5,7 @@ import { AppointmentDisplay } from './components/AppointmentDisplay'
 import { Logout } from './components/Logout'
 
 const USER_URL = '/auth/user'
+const APPOINT_URL = '/appointment'
 
 const Servicepage = () => {
   const [user, setUser] = useState<User>()
@@ -17,6 +18,9 @@ const Servicepage = () => {
         .then((res: { data: SetStateAction<User | undefined> }) =>
           setUser(res.data),
         )
+      axios
+        .get<{ appointments: Appointment[] }>(APPOINT_URL)
+        .then((res) => setAppointment(res.data?.appointments || []))
     } catch (err) {}
   }, [])
 
@@ -25,6 +29,20 @@ const Servicepage = () => {
   return (
     <>
       <div>Welcome, {user?.first_name}!</div>
+      <div>
+        Current Appointments:
+        {appointments?.map((appointment) => {
+          return (
+            <AppointmentDisplay
+              type={appointment.type}
+              provider={appointment.provider}
+              start_time={appointment.start_time}
+              end_time={appointment.end_time}
+            />
+          )
+        })}
+      </div>
+
       <p>
         Want to create a new appointment slot?
         <br />
