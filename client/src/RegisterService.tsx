@@ -88,6 +88,7 @@ const RegisterService = () => {
       setEmail('')
       setPhonenum('')
       setPwd('')
+      setSuccess(true)
     } catch (err) {}
   }
 
