@@ -17,10 +17,10 @@ This Web API requires the `bas-db` shared library. For now, we need to link this
 ```
 cd ../db
 npm install
-npm run prepare
 npm link
 
 cd ../server
+npm install
 npm link bas-db
 ```
 

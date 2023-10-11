@@ -101,6 +101,7 @@ export async function searchAppointments({
 export async function createAppointment({
   type,
   provider,
+  description,
   start_time,
   end_time,
 }: CreateAppointmentArgs): Promise<Appointment> {
@@ -114,6 +115,7 @@ export async function createAppointment({
   }
 
   appointment.type = type
+  appointment.description = description
   appointment.provider = await expandUser(provider)
 
   // Only service providers can create appointments

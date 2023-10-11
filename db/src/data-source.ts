@@ -1,9 +1,9 @@
 import 'reflect-metadata'
 import { DataSource } from 'typeorm'
 import { Appointment, Qualification, User } from './entity'
-import { Migration1696969542348 } from './migration'
+import { Migration1696986519515 } from './migration'
 
-const migrations = [Migration1696969542348]
+const migrations = [Migration1696986519515]
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
