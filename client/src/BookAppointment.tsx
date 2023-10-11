@@ -52,8 +52,7 @@ const BookAppointment = () => {
                 end_time={appointment.end_time}
               />
             )
-          }
-          else {
+          } else {
             return null
           }
         })}
@@ -72,8 +71,7 @@ const BookAppointment = () => {
                 end_time={appointment.end_time}
               />
             )
-          }
-          else {
+          } else {
             return null
           }
         })}
@@ -89,10 +87,10 @@ const BookAppointment = () => {
                 provider={appointment.provider}
                 description={appointment.description}
                 start_time={appointment.start_time}
-                end_time={appointment.end_time} />
+                end_time={appointment.end_time}
+              />
             )
-          }
-          else {
+          } else {
             return null
           }
         })}

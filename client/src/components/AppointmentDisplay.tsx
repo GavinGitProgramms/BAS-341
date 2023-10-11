@@ -3,7 +3,7 @@ export function AppointmentDisplay(props: any) {
     <div>
       Type: {props.type}
       <br />
-      Provider: {props.provider.username}
+      Provider: {props.provider.first_name} {props.provider.last_name}
       <br />
       Description: {props.description}
       <br />
