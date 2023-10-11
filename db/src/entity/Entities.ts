@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -81,10 +82,15 @@ export class Appointment {
   })
   type: AppointmentType
 
+  @Column()
+  description: string
+
   @ManyToOne(() => User)
+  @JoinColumn({ name: 'user_id' })
   provider: User
 
   @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'provider_id' })
   user: User | null
 
   @Column({ type: 'timestamp' })
@@ -109,5 +115,6 @@ export class Qualification {
   description: string
 
   @ManyToOne(() => User, (user) => user.qualifications)
+  @JoinColumn({ name: 'user_id' })
   user: User
 }

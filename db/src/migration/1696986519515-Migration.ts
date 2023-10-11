@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm'
 
-export class Migration1696969542348 implements MigrationInterface {
-  name = 'Migration1696969542348'
+export class Migration1696986519515 implements MigrationInterface {
+  name = 'Migration1696986519515'
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -20,31 +20,31 @@ export class Migration1696969542348 implements MigrationInterface {
       `CREATE TYPE "public"."appointment_type_enum" AS ENUM('BEAUTY', 'FITNESS', 'MEDICAL')`,
     )
     await queryRunner.query(
-      `CREATE TABLE "appointment" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "type" "public"."appointment_type_enum" NOT NULL, "start_time" TIMESTAMP NOT NULL, "end_time" TIMESTAMP NOT NULL, "created_date" TIMESTAMP NOT NULL DEFAULT now(), "updated_date" TIMESTAMP NOT NULL DEFAULT now(), "providerId" uuid, "userId" uuid, CONSTRAINT "PK_e8be1a53027415e709ce8a2db74" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "appointment" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "type" "public"."appointment_type_enum" NOT NULL, "description" character varying NOT NULL, "start_time" TIMESTAMP NOT NULL, "end_time" TIMESTAMP NOT NULL, "created_date" TIMESTAMP NOT NULL DEFAULT now(), "updated_date" TIMESTAMP NOT NULL DEFAULT now(), "user_id" uuid, "provider_id" uuid, CONSTRAINT "PK_e8be1a53027415e709ce8a2db74" PRIMARY KEY ("id"))`,
     )
     await queryRunner.query(
-      `CREATE TABLE "qualification" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "description" character varying NOT NULL, "userId" uuid, CONSTRAINT "PK_c8244868552c4364a5264440a66" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "qualification" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "description" character varying NOT NULL, "user_id" uuid, CONSTRAINT "PK_c8244868552c4364a5264440a66" PRIMARY KEY ("id"))`,
     )
     await queryRunner.query(
-      `ALTER TABLE "appointment" ADD CONSTRAINT "FK_f013bda65c235464178ac025925" FOREIGN KEY ("providerId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+      `ALTER TABLE "appointment" ADD CONSTRAINT "FK_15d50a87502380623ff0c27e458" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     )
     await queryRunner.query(
-      `ALTER TABLE "appointment" ADD CONSTRAINT "FK_2a990a304a43ccc7415bf7e3a99" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+      `ALTER TABLE "appointment" ADD CONSTRAINT "FK_378ea106aad574466ce9c50b365" FOREIGN KEY ("provider_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     )
     await queryRunner.query(
-      `ALTER TABLE "qualification" ADD CONSTRAINT "FK_6550f632c00a2739a1dad0381c1" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
+      `ALTER TABLE "qualification" ADD CONSTRAINT "FK_ded2abe65914cdd8f863151519b" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     )
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE "qualification" DROP CONSTRAINT "FK_6550f632c00a2739a1dad0381c1"`,
+      `ALTER TABLE "qualification" DROP CONSTRAINT "FK_ded2abe65914cdd8f863151519b"`,
     )
     await queryRunner.query(
-      `ALTER TABLE "appointment" DROP CONSTRAINT "FK_2a990a304a43ccc7415bf7e3a99"`,
+      `ALTER TABLE "appointment" DROP CONSTRAINT "FK_378ea106aad574466ce9c50b365"`,
     )
     await queryRunner.query(
-      `ALTER TABLE "appointment" DROP CONSTRAINT "FK_f013bda65c235464178ac025925"`,
+      `ALTER TABLE "appointment" DROP CONSTRAINT "FK_15d50a87502380623ff0c27e458"`,
     )
     await queryRunner.query(`DROP TABLE "qualification"`)
     await queryRunner.query(`DROP TABLE "appointment"`)

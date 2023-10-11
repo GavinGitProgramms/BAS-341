@@ -66,6 +66,8 @@ export type SearchAppointmentsArgs = {
 export type CreateAppointmentArgs = {
   /** The type of appointment. */
   type: AppointmentType
+  /** The description of the appointment. */
+  description: string
   /** The provider of the appointment. */
   provider: User | string
   /** The start time of the appointment. */
