@@ -8,6 +8,7 @@ import './types/entity.types'
 import Userpage from './Userpage'
 import Servicepage from './Servicepage'
 import NewAppointment from './NewAppointment'
+import BookAppointment from './BookAppointment'
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/registeruser" element={<RegisterUser />} />
         <Route path="/registerservice" element={<RegisterService />} />
         <Route path="/userhomepage" element={<Userpage />} />
+        <Route path="/userhomepage/bookapp" element={<BookAppointment />} />
         <Route path="/servicepage" element={<Servicepage />} />
         <Route path="/servicepage/newslot" element={<NewAppointment />} />
       </Routes>
