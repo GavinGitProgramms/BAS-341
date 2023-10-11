@@ -93,6 +93,10 @@ const NewAppointment = () => {
         <br />
         <button>Create</button>
       </form>
+      <br />
+      <span className="line">
+        <a href="/servicepage">Home</a>
+      </span>
     </>
   )
 }

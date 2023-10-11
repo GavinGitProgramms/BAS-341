@@ -9,6 +9,7 @@ import Userpage from './Userpage'
 import Servicepage from './Servicepage'
 import NewAppointment from './NewAppointment'
 import BookAppointment from './BookAppointment'
+import NewQualification from './NewQualification'
 
 function App() {
   return (
@@ -21,6 +22,10 @@ function App() {
         <Route path="/userhomepage/bookapp" element={<BookAppointment />} />
         <Route path="/servicepage" element={<Servicepage />} />
         <Route path="/servicepage/newslot" element={<NewAppointment />} />
+        <Route
+          path="/servicepage/qualifications"
+          element={<NewQualification />}
+        />
       </Routes>
     </>
   )

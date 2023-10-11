@@ -60,6 +60,10 @@ const BookAppointment = () => {
         />
         <button>Book</button>
       </form>
+      <br />
+      <span className="line">
+        <a href="/userhomepage">Home</a>
+      </span>
     </>
   )
 }

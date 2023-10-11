@@ -3,6 +3,7 @@ import axios from './api/axios'
 import { Appointment, User } from './types/entity.types'
 import { AppointmentDisplay } from './components/AppointmentDisplay'
 import { Logout } from './components/Logout'
+import { QualificationDisplay } from './components/QualificationDisplay'
 
 const USER_URL = '/auth/user'
 const APPOINT_URL = '/appointment'
@@ -28,6 +29,12 @@ const Servicepage = () => {
     <>
       <div>Welcome, {user?.first_name}!</div>
       <div>
+        Qualifications:
+        {user?.qualifications.map((qualification) => {
+          return <QualificationDisplay qualification={qualification} />
+        })}
+      </div>
+      <div>
         Current Appointments:
         {appointments?.map((appointment) => {
           return (
@@ -47,6 +54,14 @@ const Servicepage = () => {
         <br />
         <span className="line">
           <a href="/servicepage/newslot">New Slot</a>
+        </span>
+      </p>
+
+      <p>
+        Want to add qualifications?
+        <br />
+        <span className="line">
+          <a href="/servicepage/qualifications">New Qualification</a>
         </span>
       </p>
       <Logout />
