@@ -24,8 +24,6 @@ const Servicepage = () => {
     } catch (err) {}
   }, [])
 
-  const startNewAppointment = () => {}
-
   return (
     <>
       <div>Welcome, {user?.first_name}!</div>
@@ -36,6 +34,7 @@ const Servicepage = () => {
             <AppointmentDisplay
               type={appointment.type}
               provider={appointment.provider}
+              description={appointment.description}
               start_time={appointment.start_time}
               end_time={appointment.end_time}
             />

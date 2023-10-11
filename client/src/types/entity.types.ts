@@ -53,6 +53,11 @@ export type Appointment = BaseEntity<{
   provider: string
 
   /**
+   * The users description of the appointment.
+   */
+  description: string
+
+  /**
    * The user that signs up for an appointment.
    * This value is `null` before any user signs up.
    */

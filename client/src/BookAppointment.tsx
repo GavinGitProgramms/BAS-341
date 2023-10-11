@@ -29,6 +29,7 @@ const BookAppointment = () => {
     e.preventDefault()
     try {
       const response = await axios.post(BOOK_URL, JSON.stringify({ id: appID }))
+      setAppID('')
     } catch (error) {}
   }
 
@@ -42,6 +43,7 @@ const BookAppointment = () => {
               id={appointment.id}
               type={appointment.type}
               provider={appointment.provider}
+              description={appointment.description}
               start_time={appointment.start_time}
               end_time={appointment.end_time}
             />
