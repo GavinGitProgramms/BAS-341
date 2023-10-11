@@ -84,6 +84,9 @@ export async function searchAppointments({
 
   const appointments = await appointmentRepo.find({
     where: whereOptions,
+    relations: {
+      provider: true,
+    },
   })
 
   return appointments

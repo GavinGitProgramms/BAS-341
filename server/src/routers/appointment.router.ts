@@ -85,7 +85,7 @@ async function getBookedAppointmentHandler(req: Request, res: Response) {
     }
 
     // Make sure that the user and provider data is not returned
-    const { user, provider, ...resData } = appointment
+    const { user, ...resData } = appointment
 
     res.json({ appointment: resData })
   } catch (err) {
