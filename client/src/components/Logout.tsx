@@ -11,7 +11,9 @@ export function Logout(props: any) {
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,
       })
-    } catch (error) {}
+    } catch (error) {
+      console.log('Logout Failed')
+    }
   }
 
   return <button onClick={handleButtonClick}>Logout</button>

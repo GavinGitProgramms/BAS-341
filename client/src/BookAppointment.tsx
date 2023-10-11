@@ -4,7 +4,7 @@ import { Appointment, User } from './types/entity.types'
 import { AppointmentDisplayID } from './components/AppointmentDisplayID'
 
 const USER_URL = '/auth/user'
-const APPOINT_URL = '/appointment'
+const APPOINT_URL = '/appointment/all'
 
 const BookAppointment = () => {
   const [user, setUser] = useState<User>()
@@ -18,10 +18,8 @@ const BookAppointment = () => {
           setUser(res.data),
         )
       axios
-        .get<Appointment[]>(APPOINT_URL)
-        .then((res: { data: SetStateAction<Appointment[] | undefined> }) =>
-          setAppointment(res.data),
-        )
+        .get<{ appointments: Appointment[] }>(APPOINT_URL)
+        .then((res) => setAppointment(res.data?.appointments || []))
     } catch (err) {}
   }, [])
 

@@ -9,6 +9,7 @@ const NewAppointment = () => {
   const [type, setType] = useState('')
   const [start_time, setStart] = useState('')
   const [end_time, setEnd] = useState('')
+  const [description, setDescription] = useState('')
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
@@ -56,6 +57,15 @@ const NewAppointment = () => {
         <input
           type="text"
           id="end_time"
+          onChange={(e) => setEnd(e.target.value)}
+          value={end_time}
+          required
+        ></input>
+        <br />
+        <label htmlFor="description">Description:</label>
+        <input
+          type="text"
+          id="description"
           onChange={(e) => setEnd(e.target.value)}
           value={end_time}
           required

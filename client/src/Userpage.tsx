@@ -9,7 +9,7 @@ const APPOINT_URL = '/appointment'
 
 const Userpage = () => {
   const [user, setUser] = useState<User>()
-  const [appointments, setAppointment] = useState<Appointment[]>()
+  const [appointments, setAppointment] = useState<Appointment[]>([])
 
   useEffect(() => {
     try {
@@ -19,10 +19,8 @@ const Userpage = () => {
           setUser(res.data),
         )
       axios
-        .get<Appointment[]>(APPOINT_URL)
-        .then((res: { data: SetStateAction<Appointment[] | undefined> }) =>
-          setAppointment(res.data),
-        )
+        .get<{ appointments: Appointment[] }>(APPOINT_URL)
+        .then((res) => setAppointment(res.data?.appointments || []))
     } catch (err) {}
   }, [])
 
@@ -42,6 +40,12 @@ const Userpage = () => {
           )
         })}
       </div>
+      <p>
+        <br />
+        <span className="line">
+          <a href="/userhomepage/bookapp">Book New Appointment</a>
+        </span>
+      </p>
       <Logout />
     </>
   )

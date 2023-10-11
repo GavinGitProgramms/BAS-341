@@ -87,10 +87,10 @@ const RegisterUser = () => {
     <>
       {success ? (
         <section>
-          <h1>New Appointment Slot Created!</h1>
+          <h1>Account Created!</h1>
           <br />
           <p>
-            <a href={'/servicepage'}>Go Back</a>
+            <a href={'/'}>Login</a>
           </p>
         </section>
       ) : (

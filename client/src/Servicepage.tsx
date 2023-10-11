@@ -10,7 +10,6 @@ const Servicepage = () => {
   const [user, setUser] = useState<User>()
   const [appointments, setAppointment] = useState<Appointment[]>()
 
-  /*
   useEffect(() => {
     try {
       axios
@@ -19,7 +18,7 @@ const Servicepage = () => {
           setUser(res.data),
         )
     } catch (err) {}
-  }, []) */
+  }, [])
 
   const startNewAppointment = () => {}
 
