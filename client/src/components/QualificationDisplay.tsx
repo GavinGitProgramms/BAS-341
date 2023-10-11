@@ -1,3 +1,3 @@
 export function QualificationDisplay(props: any) {
-  return <div>{props.qualification}</div>
+  return <div>{props.qualification.description}</div>
 }

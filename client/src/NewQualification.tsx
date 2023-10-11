@@ -3,6 +3,7 @@ import axios from './api/axios'
 import { Appointment, User } from './types/entity.types'
 
 const USER_URL = '/auth/user'
+const QUAL_URL = '/provider/qualification'
 
 const NewQualification = () => {
   const [qualification, setQualification] = useState('')
@@ -20,8 +21,17 @@ const NewQualification = () => {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault()
-    user?.qualifications.push(qualification)
-    console.log(user?.qualifications)
+    try {
+      const response = await axios.post(
+        QUAL_URL,
+        JSON.stringify({ description: qualification }),
+        {
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true,
+        },
+      )
+      setQualification('')
+    } catch (error) {}
   }
 
   return (
