@@ -37,18 +37,66 @@ const BookAppointment = () => {
     <>
       <div>
         Available Appointments
+        <br />
+        Beauty:
+        <br />
         {appointments?.map((appointment) => {
-          return (
-            <AppointmentDisplayID
-              id={appointment.id}
-              type={appointment.type}
-              provider={appointment.provider}
-              description={appointment.description}
-              start_time={appointment.start_time}
-              end_time={appointment.end_time}
-            />
-          )
+          if (appointment.type === 'BEAUTY') {
+            return (
+              <AppointmentDisplayID
+                id={appointment.id}
+                type={appointment.type}
+                provider={appointment.provider}
+                description={appointment.description}
+                start_time={appointment.start_time}
+                end_time={appointment.end_time}
+              />
+            )
+          }
+          else {
+            return null
+          }
         })}
+        <br />
+        Fitness:
+        <br />
+        {appointments?.map((appointment) => {
+          if (appointment.type === 'FITNESS') {
+            return (
+              <AppointmentDisplayID
+                id={appointment.id}
+                type={appointment.type}
+                provider={appointment.provider}
+                description={appointment.description}
+                start_time={appointment.start_time}
+                end_time={appointment.end_time}
+              />
+            )
+          }
+          else {
+            return null
+          }
+        })}
+        <br />
+        Medical:
+        <br />
+        {appointments?.map((appointment) => {
+          if (appointment.type === 'MEDICAL') {
+            return (
+              <AppointmentDisplayID
+                id={appointment.id}
+                type={appointment.type}
+                provider={appointment.provider}
+                description={appointment.description}
+                start_time={appointment.start_time}
+                end_time={appointment.end_time} />
+            )
+          }
+          else {
+            return null
+          }
+        })}
+        <br />
       </div>
       <form onSubmit={handleSubmit}>
         <label htmlFor="appointmentid">Appointment ID:</label>
