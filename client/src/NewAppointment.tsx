@@ -1,5 +1,5 @@
 import React, { SetStateAction } from 'react'
-import { useRef, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import axios from './api/axios'
 import './types/entity.types'
 import { User } from './types/entity.types'
