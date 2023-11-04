@@ -1,5 +1,5 @@
 import bodyParser from 'body-parser'
-import cors from 'cors'
+import morgan from 'morgan'
 import express from 'express'
 import session from 'express-session'
 import 'reflect-metadata'
@@ -14,6 +14,8 @@ const PORT = process.env.PORT || 3000
 
 // Parse JSON bodies (as sent by API clients)
 app.use(bodyParser.json())
+
+app.use(morgan('dev'))
 
 // Use the session middleware to track authenticated users.
 app.use(
@@ -31,4 +33,5 @@ app.use('/provider', providerRouter)
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`)
+  console.log('!!! AAA ??? BBB CCC ddd')
 })
