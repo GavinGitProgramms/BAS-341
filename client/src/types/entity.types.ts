@@ -32,7 +32,7 @@ export type User = BaseEntity<{
   last_name: string
   email: string
   phone_number: string
-  qualifications: string[]
+  qualifications: Qualification[]
 }>
 
 export type Appointment = BaseEntity<{
@@ -74,3 +74,8 @@ export type Appointment = BaseEntity<{
    */
   end_time: Date
 }>
+
+export type Qualification = {
+  id: string
+  description: string
+}
