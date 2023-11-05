@@ -1,5 +1,6 @@
 import { useUser } from '../hooks'
 import { Link, useLocation } from 'react-router-dom'
+import BASIcon from '../images/BAS.svg'
 
 export type LayoutProps = {
   children: React.ReactNode
@@ -47,13 +48,14 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex-1 px-2 mx-2">
             <Link
               to="/"
-              className={`text-lg font-bold ${
+              className={`flex items-center text-lg font-bold select-none ${
                 location.pathname === '/' || location.pathname === '/login'
                   ? 'pointer-events-none'
                   : ''
               }`}
             >
-              BAS
+              <img src={BASIcon} alt="BAS Icon" className="w-10 h-10" />
+              <span className="ml-2 align-middle">BAS</span>
             </Link>
           </div>
           <div className="flex-none hidden lg:block">
