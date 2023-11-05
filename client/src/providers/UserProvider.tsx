@@ -8,6 +8,7 @@ const LOGOUT_URL = '/auth/logout'
 export type UserLoginDetails = { username: string; password: string }
 
 export type UserContextType = {
+  loading: boolean
   isAuthenticated: boolean
   user: User | null
   login: (userDetails: UserLoginDetails) => Promise<void>
@@ -18,14 +19,20 @@ export type UserProviderProps = {
   children: React.ReactNode
 }
 
-export const UserContext = createContext<UserContextType>({
-  isAuthenticated: false,
-  user: null,
-  login: () => Promise.resolve(),
-  logout: () => Promise.resolve(),
-})
+function defaultUserContext(): UserContextType {
+  return {
+    loading: true,
+    isAuthenticated: false,
+    user: null,
+    login: () => Promise.resolve(),
+    logout: () => Promise.resolve(),
+  }
+}
+
+export const UserContext = createContext<UserContextType>(defaultUserContext())
 
 export default function UserProvider({ children }: UserProviderProps) {
+  const [loading, setLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState<User | null>(null)
 
@@ -39,6 +46,8 @@ export default function UserProvider({ children }: UserProviderProps) {
         setIsAuthenticated(false)
         setUser(null)
       }
+
+      setLoading(false)
     }
 
     fetchUser()
@@ -84,9 +93,15 @@ export default function UserProvider({ children }: UserProviderProps) {
     }
   }
 
+  const contextValue: UserContextType = {
+    loading,
+    isAuthenticated,
+    user,
+    login,
+    logout,
+  }
+
   return (
-    <UserContext.Provider value={{ isAuthenticated, user, login, logout }}>
-      {children}
-    </UserContext.Provider>
+    <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
   )
 }

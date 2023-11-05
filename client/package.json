@@ -1,7 +1,7 @@
 {
   "name": "bas-client",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev:local": "cross-env API_BASE_URL=http://localhost:3000 vite",
@@ -30,6 +30,7 @@
     "@vitejs/plugin-react": "^4.0.3",
     "autoprefixer": "^10.4.16",
     "cross-env": "^7.0.3",
+    "daisyui": "^3.9.4",
     "eslint": "^8.53.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
