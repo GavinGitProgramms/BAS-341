@@ -10,6 +10,7 @@ import Userpage from './Userpage'
 import Home from './pages/Home'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
+import Register from './pages/Register'
 import UserProvider from './providers/UserProvider'
 import { useUser } from './hooks'
 
@@ -41,8 +42,7 @@ function AppRoutes() {
         }
       />
       <Route path="/login" element={<Login />} />
-      <Route path="/registeruser" element={<RegisterUser />} />
-      <Route path="/registerservice" element={<RegisterService />} />
+      <Route path="/register" element={<Register />} />
       <Route path="/userhomepage" element={<Userpage />} />
       <Route path="/userhomepage/bookapp" element={<BookAppointment />} />
       <Route path="/servicepage" element={<Servicepage />} />

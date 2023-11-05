@@ -7,8 +7,8 @@ export default function Home() {
   const { user } = useUser()
   return (
     <Layout>
-      <div className="container mx-auto px-4">
-        <div className="card m-3 w-96 bg-primary-content shadow-xl">
+      <div className="container p-6">
+        <div className="card m-6 w-96 bg-primary-content shadow-xl">
           <figure>
             <img src={Img1} alt="Shoes" />
           </figure>

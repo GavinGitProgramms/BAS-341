@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { useUser } from '../hooks'
 import Layout from '../layout/Layout'
 
@@ -76,9 +76,9 @@ export default function Login() {
             </p>
           )}
           <div className="flex flex-col items-center mt-6">
-            <a href="/registeruser" className="link link-hover">
+            <Link to="/register" className="link link-hover">
               Need an account? Sign Up
-            </a>
+            </Link>
           </div>
         </div>
       </div>

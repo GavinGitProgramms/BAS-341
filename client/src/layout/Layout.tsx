@@ -22,7 +22,10 @@ export default function Layout({ children }: LayoutProps) {
         <div className="w-full navbar bg-base-300">
           <div
             className={`flex-none lg:hidden ${
-              location.pathname === '/login' ? 'pointer-events-none' : ''
+              location.pathname === '/login' ||
+              location.pathname === '/register'
+                ? 'pointer-events-none'
+                : ''
             }`}
           >
             <label htmlFor="main-drawer" className="btn btn-square btn-ghost">
@@ -71,7 +74,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
 
         {/* Content */}
-        <main className="p-4 w-full">{children}</main>
+        <main className="w-full">{children}</main>
       </div>
       {isAuthenticated && (
         <div className="drawer-side">

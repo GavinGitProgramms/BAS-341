@@ -1,20 +1,21 @@
 import { createContext, useEffect, useState } from 'react'
 import api from '../api'
 import { User } from '../types/entity.types'
+import { CreateUserArgs, LoginArgs } from '../types'
 
 const LOGIN_URL = '/auth/login'
 const LOGOUT_URL = '/auth/logout'
 const USER_URL = '/auth/user'
-
-export type UserLoginDetails = { username: string; password: string }
+const REGISTER_URL = '/auth/register'
 
 export type UserContextType = {
   loading: boolean
   isAuthenticated: boolean
   user: User | null
   errMsg: ''
-  login: (userDetails: UserLoginDetails) => Promise<void>
+  login: (args: LoginArgs) => Promise<void>
   logout: () => Promise<void>
+  register: (args: CreateUserArgs) => Promise<void>
 }
 
 export type UserProviderProps = {
@@ -29,6 +30,7 @@ function defaultUserContext(): UserContextType {
     errMsg: '',
     login: () => Promise.resolve(),
     logout: () => Promise.resolve(),
+    register: () => Promise.resolve(),
   }
 }
 
@@ -69,7 +71,7 @@ export default function UserProvider({ children }: UserProviderProps) {
   /**
    * Logs in the user with the provided username and password.
    */
-  async function login({ username, password }: UserLoginDetails) {
+  async function login({ username, password }: LoginArgs) {
     try {
       const response = await api.post(LOGIN_URL, { username, password })
       if (response.status === 200) {
@@ -101,6 +103,25 @@ export default function UserProvider({ children }: UserProviderProps) {
     }
   }
 
+  /**
+   * Registers a new user.
+   */
+  async function register(args: CreateUserArgs) {
+    try {
+      const response = await api.post(REGISTER_URL, args)
+      if (response.status === 200) {
+        await fetchUser()
+      } else {
+        setUser(null)
+        setIsAuthenticated(false)
+      }
+    } catch (err) {
+      console.error(err)
+      setUser(null)
+      setIsAuthenticated(false)
+    }
+  }
+
   const contextValue: UserContextType = {
     loading,
     isAuthenticated,
@@ -108,6 +129,7 @@ export default function UserProvider({ children }: UserProviderProps) {
     errMsg: '',
     login,
     logout,
+    register,
   }
 
   return (
