@@ -1,52 +1,92 @@
 import { useUser } from '../hooks'
+import { Link, useLocation } from 'react-router-dom'
 
 export type LayoutProps = {
   children: React.ReactNode
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const location = useLocation()
   const { isAuthenticated, logout } = useUser()
+
+  const handleLogout = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+    logout()
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Navigation Bar */}
-      <nav className="bg-white shadow-lg">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex justify-between">
-            <div className="flex space-x-7">
-              <div>
-                {/* Website Logo */}
-                <a href="/" className="flex items-center py-4 px-2">
-                  <span className="font-semibold text-gray-500 text-lg">
-                    BAS
-                  </span>
-                </a>
-              </div>
-              {/* Primary Navbar items */}
-              <div className="hidden md:flex items-center space-x-1"></div>
-            </div>
-            {/* Secondary Navbar items */}
+    <div className="drawer drawer-mobile">
+      <input id="main-drawer" type="checkbox" className="drawer-toggle" />
+      <div className="drawer-content flex flex-col min-h-screen bg-base-100">
+        {/* Navbar */}
+        <div className="w-full navbar bg-base-300">
+          <div
+            className={`flex-none lg:hidden ${
+              location.pathname === '/login' ? 'pointer-events-none' : ''
+            }`}
+          >
+            <label htmlFor="main-drawer" className="btn btn-square btn-ghost">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                className="inline-block w-6 h-6 stroke-current"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16m-7 6h7"
+                ></path>
+              </svg>
+            </label>
+          </div>
+          <div className="flex-1 px-2 mx-2">
+            <Link
+              to="/"
+              className={`text-lg font-bold ${
+                location.pathname === '/' || location.pathname === '/login'
+                  ? 'pointer-events-none'
+                  : ''
+              }`}
+            >
+              BAS
+            </Link>
+          </div>
+          <div className="flex-none hidden lg:block">
             {isAuthenticated ? (
-              <div className="hidden md:flex items-center space-x-3 ">
-                <a
-                  href="#"
-                  onClick={logout}
-                  className="py-2 px-2 font-medium text-gray-500 rounded hover:bg-gray-700 hover:text-white transition duration-300"
-                >
-                  Log Out
-                </a>
-              </div>
+              <ul className="menu menu-horizontal">
+                <li>
+                  <a href="/" onClick={handleLogout} className="rounded-btn">
+                    Log Out
+                  </a>
+                </li>
+              </ul>
             ) : (
-              <div className="hidden md:flex items-center space-x-3 "></div>
+              <ul className="menu menu-horizontal">
+                {/* Include other navbar links here for unauthenticated users */}
+              </ul>
             )}
           </div>
         </div>
-      </nav>
 
-      {/* Sidebar & Content */}
-      <div className="flex flex-col md:flex-row">
         {/* Content */}
-        <main className="p-4 w-full md:w-4/5 xl:w-5/6">{children}</main>
+        <main className="p-4 w-full">{children}</main>
       </div>
+      {isAuthenticated && (
+        <div className="drawer-side">
+          <label htmlFor="main-drawer" className="drawer-overlay"></label>
+          <ul className="menu p-4 overflow-y-auto w-80 bg-base-200">
+            {/* Drawer sidebar content here */}
+            <li>
+              <a href="/" onClick={handleLogout} className="rounded-btn">
+                Log Out
+              </a>
+            </li>
+            {/* You can add more links here */}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }

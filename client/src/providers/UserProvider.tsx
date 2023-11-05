@@ -1,9 +1,10 @@
 import { createContext, useEffect, useState } from 'react'
-import api from '../api/axios'
+import api from '../api'
 import { User } from '../types/entity.types'
 
 const LOGIN_URL = '/auth/login'
 const LOGOUT_URL = '/auth/logout'
+const USER_URL = '/auth/user'
 
 export type UserLoginDetails = { username: string; password: string }
 
@@ -11,6 +12,7 @@ export type UserContextType = {
   loading: boolean
   isAuthenticated: boolean
   user: User | null
+  errMsg: ''
   login: (userDetails: UserLoginDetails) => Promise<void>
   logout: () => Promise<void>
 }
@@ -24,6 +26,7 @@ function defaultUserContext(): UserContextType {
     loading: true,
     isAuthenticated: false,
     user: null,
+    errMsg: '',
     login: () => Promise.resolve(),
     logout: () => Promise.resolve(),
   }
@@ -31,59 +34,64 @@ function defaultUserContext(): UserContextType {
 
 export const UserContext = createContext<UserContextType>(defaultUserContext())
 
+/**
+ * Provides user authentication and user data to the application.
+ */
 export default function UserProvider({ children }: UserProviderProps) {
   const [loading, setLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState<User | null>(null)
 
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const response = await api.get('/auth/user')
-        setIsAuthenticated(true)
-        setUser(response.data)
-      } catch (error) {
-        setIsAuthenticated(false)
-        setUser(null)
-      }
-
-      setLoading(false)
+  /**
+   * Fetches user data from the API and updates the state accordingly.
+   */
+  async function fetchUser() {
+    try {
+      const response = await api.get(USER_URL)
+      setIsAuthenticated(true)
+      setUser(response.data)
+    } catch (err) {
+      console.error(err)
+      setIsAuthenticated(false)
+      setUser(null)
     }
 
+    setLoading(false)
+  }
+
+  /**
+   * Fetch user data on mount.
+   */
+  useEffect(() => {
     fetchUser()
   }, [])
 
+  /**
+   * Logs in the user with the provided username and password.
+   */
   async function login({ username, password }: UserLoginDetails) {
     try {
-      const response = await api.post(
-        LOGIN_URL,
-        JSON.stringify({ username, password }),
-        {
-          headers: { 'Content-Type': 'application/json' },
-          withCredentials: true,
-        },
-      )
-
+      const response = await api.post(LOGIN_URL, { username, password })
       if (response.status === 200) {
-        setIsAuthenticated(true)
-        setUser(response.data)
+        await fetchUser()
       } else {
         setUser(null)
         setIsAuthenticated(false)
       }
     } catch (err) {
+      console.error(err)
       setUser(null)
       setIsAuthenticated(false)
     }
   }
 
+  /**
+   * Logs out the user by making a GET request to the logout URL.
+   * Sets the user to null and isAuthenticated to false upon successful logout.
+   */
   async function logout() {
     try {
-      const response = await api.get(LOGOUT_URL, {
-        headers: {},
-        withCredentials: true,
-      })
-
+      const response = await api.get(LOGOUT_URL)
       if (response.status === 200) {
         setUser(null)
         setIsAuthenticated(false)
@@ -97,6 +105,7 @@ export default function UserProvider({ children }: UserProviderProps) {
     loading,
     isAuthenticated,
     user,
+    errMsg: '',
     login,
     logout,
   }
