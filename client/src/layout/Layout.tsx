@@ -10,7 +10,7 @@ export default function Layout({ children }: LayoutProps) {
   const location = useLocation()
   const { isAuthenticated, logout } = useUser()
 
-  const handleLogout = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleLogout = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
     logout()
   }
@@ -62,9 +62,14 @@ export default function Layout({ children }: LayoutProps) {
             {isAuthenticated ? (
               <ul className="menu menu-horizontal">
                 <li>
-                  <a href="/" onClick={handleLogout} className="rounded-btn">
+                  <Link to="/schedule" className="rounded-btn">
+                    Schedule
+                  </Link>
+                </li>
+                <li>
+                  <button onClick={handleLogout} className="rounded-btn">
                     Log Out
-                  </a>
+                  </button>
                 </li>
               </ul>
             ) : (
@@ -82,13 +87,16 @@ export default function Layout({ children }: LayoutProps) {
         <div className="drawer-side">
           <label htmlFor="main-drawer" className="drawer-overlay"></label>
           <ul className="menu p-4 overflow-y-auto w-80 bg-base-200">
-            {/* Drawer sidebar content here */}
             <li>
-              <a href="/" onClick={handleLogout} className="rounded-btn">
-                Log Out
-              </a>
+              <Link to="/schedule" className="rounded-btn">
+                Schedule
+              </Link>
             </li>
-            {/* You can add more links here */}
+            <li>
+              <button onClick={handleLogout} className="rounded-btn">
+                Log Out
+              </button>
+            </li>
           </ul>
         </div>
       )}

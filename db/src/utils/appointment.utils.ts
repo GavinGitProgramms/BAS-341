@@ -1,4 +1,4 @@
-import { FindOptionsWhere, IsNull } from 'typeorm'
+import { FindOneOptions, FindOptionsWhere, IsNull } from 'typeorm'
 import { AppDataSource } from '../data-source'
 import { Appointment, AppointmentType, UserType } from '../entity'
 import type {
@@ -33,14 +33,17 @@ export async function getAppointment({
   // Restrict the search to the given user if provided
   if (user) {
     user = await expandUser(user)
+    const whereOptions: Array<FindOptionsWhere<Appointment>> = []
+    whereOptions.push({ id, user: IsNull() })
     const relation = user.type === UserType.REGULAR ? 'user' : 'provider'
-    return appointmentRepo.findOne({
-      where: {
-        id,
-        [relation]: { id: user.id },
-      },
+    whereOptions.push({ id, [relation]: { id: user.id } })
+
+    const findOptions: FindOneOptions<Appointment> = {
+      where: whereOptions,
       relations,
-    })
+    }
+
+    return appointmentRepo.findOne(findOptions)
   }
 
   return appointmentRepo.findOne({
@@ -86,6 +89,7 @@ export async function searchAppointments({
     where: whereOptions,
     relations: {
       provider: true,
+      user: true,
     },
   })
 

@@ -1,2 +1,3 @@
-export * from './user.hooks'
+export * from './appointments.hooks'
 export * from './qualifications.hooks'
+export * from './user.hooks'

@@ -51,7 +51,7 @@ export type Appointment = BaseEntity<{
    * The service provider user which created the slot
    * for this appointment.
    */
-  provider: string
+  provider: User | null
 
   /**
    * The users description of the appointment.

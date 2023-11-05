@@ -62,18 +62,19 @@ async function getAllAppointmentsHandler(req: Request, res: Response) {
 }
 
 /**
- * Handles GET requests for a specific booked appointment by ID for a given user.
+ * Handles GET requests for a specific appointment by ID for a given user.
  *
- * Requires an authenticated user for access.
- * For use by regular users only.
+ * Requires an authenticated user for access. Regular users can't access
+ * appointments booked by other users.
  *
  * @param req - The request object containing the authenticated user and the appointment ID.
  * @param res - The response object to send the appointment data or error message.
  * @returns The appointment data or an error message if the appointment search fails.
  */
-async function getBookedAppointmentHandler(req: Request, res: Response) {
+async function getAppointmentHandler(req: Request, res: Response) {
   const { username } = req.user!
   const { appointmentId } = req.params
+  console.log(appointmentId)
   try {
     const appointment = await getAppointment({
       id: appointmentId,
@@ -84,10 +85,7 @@ async function getBookedAppointmentHandler(req: Request, res: Response) {
       return notFoundRequest(res, 'Appointment not found')
     }
 
-    // Make sure that the user and provider data is not returned
-    const { user, ...resData } = appointment
-
-    res.json({ appointment: resData })
+    res.json({ appointment })
   } catch (err) {
     const errMsg = `failed to get booked appointment for user: '${username}', because: ${err}`
     console.error(errMsg)
@@ -167,7 +165,7 @@ async function bookAppointmentHandler(
 const router = Router()
 router.get('/', ensureAuthenticated, getBookedAppointmentsHandler)
 router.get('/all', ensureAuthenticated, getAllAppointmentsHandler)
-router.get('/:appointmentId', ensureAuthenticated, getBookedAppointmentHandler)
+router.get('/:appointmentId', ensureAuthenticated, getAppointmentHandler)
 router.post('/', ensureAuthenticated, createAppointmentHandler)
 router.post('/book', ensureAuthenticated, bookAppointmentHandler)
 
