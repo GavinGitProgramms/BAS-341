@@ -5,6 +5,7 @@ import type {
   CreateQualificationArgs,
   CreateUserArgs,
   GetUserArgs,
+  UserDto,
 } from '../types'
 import { ensureInitialized } from './db.utils'
 
@@ -28,7 +29,7 @@ export function hashPassword(password: string): string {
  * @param {GetUserArgs} args - The arguments for retrieving a user.
  * @returns {Promise<User | null>} - A promise that resolves with the retrieved user or null if not found.
  */
-export async function getUser({ username }: GetUserArgs): Promise<User | null> {
+async function getUser({ username }: GetUserArgs): Promise<User | null> {
   await ensureInitialized()
   const userRepo = AppDataSource.getRepository(User)
   const user = await userRepo.findOne({
@@ -73,7 +74,7 @@ export async function expandUser(user: User | string): Promise<User> {
 export async function checkCredentials(
   username: string,
   password: string,
-): Promise<User | false> {
+): Promise<UserDto | false> {
   const user = await getUser({ username })
   if (!user) {
     return false
@@ -82,7 +83,7 @@ export async function checkCredentials(
   const hash = hashPassword(password)
   const isCorrect = hash === user.password_hash
   if (isCorrect) {
-    return user
+    return userDto(user)
   }
 
   return false
@@ -92,7 +93,7 @@ export async function checkCredentials(
  * Creates a new user with the given information and saves it to the database.
  *
  * @param {CreateUserArgs} args - The arguments needed to create a new user.
- * @returns {Promise<User | null>} - A Promise that resolves with the newly created user, or null if there was an error.
+ * @returns {Promise<UserDto | null>} - A Promise that resolves with the newly created user, or null if there was an error.
  */
 export async function createUser({
   username,
@@ -102,7 +103,7 @@ export async function createUser({
   email,
   phone_number,
   password,
-}: CreateUserArgs): Promise<User | null> {
+}: CreateUserArgs): Promise<UserDto | null> {
   await ensureInitialized()
   const userRepo = AppDataSource.getRepository(User)
   const user = new User()
@@ -122,7 +123,7 @@ export async function createUser({
   user.email = email
   user.phone_number = phone_number
   user.password_hash = hashPassword(password)
-  return userRepo.save(user)
+  return userDto(await userRepo.save(user))
 }
 
 /**
@@ -131,13 +132,13 @@ export async function createUser({
  * This is for use by service provider users only.
  *
  * @param {CreateQualificationArgs} args - The arguments needed to create a new qualification.
- * @returns {Promise<User | null>} - The updated user object with the new qualification.
+ * @returns {Promise<UserDto | null>} - The updated user object with the new qualification.
  * @throws {Error} - If the user is not a service provider.
  */
 export async function createQualification({
   description,
   user,
-}: CreateQualificationArgs): Promise<User | null> {
+}: CreateQualificationArgs): Promise<UserDto | null> {
   await ensureInitialized()
   const qualificationRepo = AppDataSource.getRepository(Qualification)
   const qualification = new Qualification()
@@ -149,5 +150,16 @@ export async function createQualification({
   }
 
   await qualificationRepo.save(qualification)
-  return getUser({ username: qualification.user.username })
+  const updatedUser = await getUser({ username: qualification.user.username })
+  return updatedUser ? userDto(updatedUser) : null
+}
+
+/**
+ * Converts a User object to a UserDto object by removing the password_hash property.
+ *
+ * @param user - The User object to convert.
+ * @returns The UserDto object.
+ */
+export function userDto({ password_hash, ...user }: User): UserDto {
+  return user
 }

@@ -2,13 +2,14 @@ import { FindOneOptions, FindOptionsWhere, IsNull } from 'typeorm'
 import { AppDataSource } from '../data-source'
 import { Appointment, AppointmentType, UserType } from '../entity'
 import type {
+  AppointmentDto,
   BookAppointmentArgs,
   CreateAppointmentArgs,
   GetAppointmentArgs,
   SearchAppointmentsArgs,
 } from '../types'
 import { ensureInitialized } from './db.utils'
-import { expandUser } from './user.utils'
+import { expandUser, userDto } from './user.utils'
 
 /**
  * Retrieves an appointment by ID and user (if provided).
@@ -21,7 +22,7 @@ import { expandUser } from './user.utils'
 export async function getAppointment({
   id,
   user,
-}: GetAppointmentArgs): Promise<Appointment | null> {
+}: GetAppointmentArgs): Promise<AppointmentDto | null> {
   await ensureInitialized()
   const appointmentRepo = AppDataSource.getRepository(Appointment)
 
@@ -30,26 +31,39 @@ export async function getAppointment({
     provider: true,
   }
 
-  // Restrict the search to the given user if provided
-  if (user) {
+  if (typeof user === 'string') {
+    user = await expandUser(user)
+  }
+
+  // Restrict the search to the given user if provided and the user is not an admin
+  if (user && user.type !== UserType.ADMIN) {
     user = await expandUser(user)
     const whereOptions: Array<FindOptionsWhere<Appointment>> = []
-    whereOptions.push({ id, user: IsNull() })
-    const relation = user.type === UserType.REGULAR ? 'user' : 'provider'
-    whereOptions.push({ id, [relation]: { id: user.id } })
+
+    if (user.type === UserType.REGULAR) {
+      // Regular users can only see appointments that they booked or appointments that are unbooked
+      whereOptions.push({ id, user: IsNull() })
+      whereOptions.push({ id, user: { id: user.id } })
+    } else if (user.type === UserType.SERVICE_PROVIDER) {
+      // Service providers can only see appointments that they created
+      whereOptions.push({ id, provider: { id: user.id } })
+    }
 
     const findOptions: FindOneOptions<Appointment> = {
       where: whereOptions,
       relations,
     }
 
-    return appointmentRepo.findOne(findOptions)
+    const appointment = await appointmentRepo.findOne(findOptions)
+    return appointment ? appointmentDto(appointment) : null
   }
 
-  return appointmentRepo.findOne({
+  const appointment = await appointmentRepo.findOne({
     where: { id },
     relations,
   })
+
+  return appointment ? appointmentDto(appointment) : null
 }
 
 /**
@@ -60,22 +74,29 @@ export async function getAppointment({
  * the given user.
  *
  * @param {SearchAppointmentsArgs} args - The arguments to use for the search.
- * @returns {Promise<Appointment[]>} - A promise that resolves to an array of appointments.
+ * @returns {Promise<AppointmentDto[]>} - A promise that resolves to an array of appointments.
  */
 export async function searchAppointments({
   user,
   includeAllUnbooked = false,
-}: SearchAppointmentsArgs): Promise<Appointment[]> {
+}: SearchAppointmentsArgs): Promise<AppointmentDto[]> {
   await ensureInitialized()
   const appointmentRepo = AppDataSource.getRepository(Appointment)
   const whereOptions: Array<FindOptionsWhere<Appointment>> = []
 
-  if (includeAllUnbooked) {
+  const relations = {
+    user: true,
+    provider: true,
+  }
+
+  if (typeof user === 'string') {
+    user = await expandUser(user)
+  }
+
+  if (includeAllUnbooked && user.type === UserType.REGULAR) {
     // Get all unbooked appointments for all service providers
     whereOptions.push({ user: IsNull() })
   }
-
-  user = await expandUser(user)
 
   // If the user is a regular user, then we need to search by the user field.
   // Otherwise, we need to search by the provider field.
@@ -87,13 +108,10 @@ export async function searchAppointments({
 
   const appointments = await appointmentRepo.find({
     where: whereOptions,
-    relations: {
-      provider: true,
-      user: true,
-    },
+    relations,
   })
 
-  return appointments
+  return appointments.map(appointmentDto)
 }
 
 /**
@@ -102,7 +120,7 @@ export async function searchAppointments({
  * This is for use by service provider users only.
  *
  * @param {CreateAppointmentArgs} args - The arguments needed to create an appointment.
- * @returns {Promise<Appointment>} - The newly created appointment.
+ * @returns {Promise<AppointmentDto>} - The newly created appointment.
  * @throws {Error} - If the appointment type is invalid, the provider does not exist, the user is not a service provider, or the start time is after the end time.
  */
 export async function createAppointment({
@@ -111,7 +129,7 @@ export async function createAppointment({
   description,
   start_time,
   end_time,
-}: CreateAppointmentArgs): Promise<Appointment> {
+}: CreateAppointmentArgs): Promise<AppointmentDto> {
   await ensureInitialized()
   const appointmentRepo = AppDataSource.getRepository(Appointment)
   const appointment = new Appointment()
@@ -138,24 +156,34 @@ export async function createAppointment({
   appointment.start_time = start_time
   appointment.end_time = end_time
 
-  return appointmentRepo.save(appointment)
+  const newAppointment = await appointmentRepo.save(appointment)
+  return appointmentDto(newAppointment)
 }
 
 /**
- * Books an appointment for a user.
+ * Books an appointment for a regular user.
  *
- * This is for use by regular users only.
- *
- * @param {BookAppointmentArgs} args - The arguments for booking an appointment.
- * @returns {Promise<Appointment>} - The booked appointment.
- * @throws {Error} - If no appointment exists with the given ID, if the appointment is already booked by a user, if the user does not exist, or if the user is not a regular user.
+ * @param {BookAppointmentArgs} args - The arguments needed to book an appointment.
+ * @returns {Promise<AppointmentDto>} - The booked appointment.
+ * @throws {Error} - If no appointment exists with the given ID, if the appointment is already booked by another user, if the appointment start time is not in the future, or if the user trying to book the appointment is not a regular user.
  */
 export async function bookAppointment({
   id,
   user,
-}: BookAppointmentArgs): Promise<Appointment> {
+}: BookAppointmentArgs): Promise<AppointmentDto> {
   await ensureInitialized()
-  const appointment = await getAppointment({ id })
+  const appointmentRepo = AppDataSource.getRepository(Appointment)
+
+  const relations = {
+    user: true,
+    provider: true,
+  }
+
+  const appointment = await appointmentRepo.findOne({
+    where: { id },
+    relations,
+  })
+
   if (!appointment) {
     throw new Error(`no appointment exists with the ID: ${id}`)
   }
@@ -166,6 +194,11 @@ export async function bookAppointment({
     )
   }
 
+  // Make sure that the appointment start time is in the future
+  if (appointment.start_time < new Date()) {
+    throw new Error('appointment start time must be in the future')
+  }
+
   appointment.user = await expandUser(user)
 
   // Only service providers can create appointments
@@ -173,6 +206,24 @@ export async function bookAppointment({
     throw new Error('only regular users can book appointments')
   }
 
-  const appointmentRepo = AppDataSource.getRepository(Appointment)
-  return appointmentRepo.save(appointment)
+  const updatedAppointment = await appointmentRepo.save(appointment)
+  return appointmentDto(updatedAppointment)
+}
+
+/**
+ * Converts an Appointment object to an AppointmentDto object.
+ *
+ * @param {Appointment} appointment - The Appointment object to convert.
+ * @returns {AppointmentDto} - The converted AppointmentDto object.
+ */
+export function appointmentDto({
+  user,
+  provider,
+  ...appointment
+}: Appointment): AppointmentDto {
+  return {
+    ...appointment,
+    user: user ? userDto(user) : null,
+    provider: provider ? userDto(provider) : null,
+  }
 }
