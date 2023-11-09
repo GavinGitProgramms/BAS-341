@@ -99,6 +99,9 @@ export class Appointment {
   @Column({ type: 'timestamp' })
   end_time: Date
 
+  @Column({ type: 'boolean', default: false })
+  canceled: boolean
+
   @CreateDateColumn()
   created_date: Date
 

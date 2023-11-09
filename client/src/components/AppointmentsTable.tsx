@@ -96,6 +96,7 @@ export default function AppointmentsTable({
               {renderHeaderCell('Start Time', 'start_time')}
               {renderHeaderCell('End Time', 'end_time')}
               {isProviderView && renderHeaderCell('Booked', 'isBooked')}
+              {renderHeaderCell('Cancelled', 'canceled')}
             </tr>
           </thead>
           <tbody>
@@ -122,6 +123,9 @@ export default function AppointmentsTable({
                     {appointment.user ? 'Yes' : 'No'}
                   </td>
                 )}
+                <td className="px-6 py-4">
+                  {appointment.canceled ? 'Yes' : 'No'}
+                </td>
               </tr>
             ))}
           </tbody>

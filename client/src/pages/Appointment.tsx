@@ -9,7 +9,7 @@ export default function Appointment() {
   const { user } = useUser()
   const { appointmentId } = useParams()
 
-  const { getAppointment, bookAppointment, unbookAppointment } =
+  const { getAppointment, bookAppointment, cancelAppointment } =
     useAppointments()
 
   const [appointment, setAppointment] = useState<AppointmentType | null>(null)
@@ -20,19 +20,27 @@ export default function Appointment() {
     }
   }, [appointmentId])
 
-  function handleBookAppointment() {
-    if (appointment) {
-      bookAppointment({ id: appointment.id })
+  async function handleBookAppointment() {
+    if (!appointment) {
+      return
     }
+
+    await bookAppointment({ id: appointment.id })
+
+    // Return the user to the last page they were on
+    window.history.back()
   }
 
-  function handleUnbookAppointment() {
-    if (appointment) {
-      unbookAppointment({ id: appointment.id })
+  async function handleCancelAppointment() {
+    if (!appointment) {
+      return
     }
-  }
 
-  console.log(appointment)
+    await cancelAppointment({ id: appointment.id })
+
+    // Return the user to the last page they were on
+    window.history.back()
+  }
 
   const isProviderView = user?.type === UserType.SERVICE_PROVIDER
 
@@ -43,7 +51,7 @@ export default function Appointment() {
           <div className="card bg-base-200 shadow-xl">
             <div className="card-body">
               <h2 className="card-title mb-6">Appointment Details</h2>
-              <div className="space-y-4">
+              <div className="space-y-4 mb-6">
                 <p>
                   <strong>Type:</strong> {toTitleCase(appointment.type)}
                 </p>
@@ -58,6 +66,14 @@ export default function Appointment() {
                   <strong>End Time:</strong>{' '}
                   {new Date(appointment.end_time).toLocaleString()}
                 </p>
+                <p>
+                  <strong>Status:</strong>{' '}
+                  {appointment.canceled
+                    ? 'Cancelled'
+                    : appointment.user
+                    ? 'Booked'
+                    : 'Available'}
+                </p>
                 {!isProviderView && appointment.provider && (
                   <>
                     <p>
@@ -68,28 +84,29 @@ export default function Appointment() {
                     <p>
                       <strong>Qualifications:</strong>
                     </p>
-                    <ul>
+                    <ul className="list-disc list-inside space-y-2">
                       {(appointment.provider?.qualifications || []).map(
                         (qual) => (
-                          <li key={qual.id}>{qual.description}</li>
+                          <li
+                            key={qual.id}
+                            className="text-base-content bg-base-100 rounded-md ml-4 p-2 hover:bg-base-200 transition-colors duration-300"
+                          >
+                            {qual.description}
+                          </li>
                         ),
                       )}
                     </ul>
                   </>
                 )}
-                <p>
-                  <strong>Status:</strong>{' '}
-                  {appointment.user ? 'Booked' : 'Available'}
-                </p>
               </div>
-              {!isProviderView && (
+              {!isProviderView && !appointment.canceled && (
                 <div className="card-actions justify-end">
                   {appointment.user ? (
                     <button
-                      onClick={handleUnbookAppointment}
+                      onClick={handleCancelAppointment}
                       className="btn btn-error"
                     >
-                      Unbook Appointment
+                      Cancel Appointment
                     </button>
                   ) : (
                     <button
@@ -97,6 +114,18 @@ export default function Appointment() {
                       className="btn btn-primary"
                     >
                       Book Appointment
+                    </button>
+                  )}
+                </div>
+              )}
+              {isProviderView && (
+                <div className="card-actions justify-end">
+                  {!appointment.canceled && (
+                    <button
+                      onClick={handleCancelAppointment}
+                      className="btn btn-error"
+                    >
+                      Cancel Appointment
                     </button>
                   )}
                 </div>

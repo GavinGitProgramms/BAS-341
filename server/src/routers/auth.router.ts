@@ -3,16 +3,12 @@ import {
   UserType,
   checkCredentials,
   createUser,
-  getUser,
+  expandUser,
+  userDto,
 } from 'bas-db'
 import { Request, Response, Router } from 'express'
 import { ensureAuthenticated } from '../middleware'
-import {
-  badRequest,
-  internalErrorRequest,
-  unauthorizedRequest,
-  userDTO,
-} from '../utils'
+import { badRequest, internalErrorRequest, unauthorizedRequest } from '../utils'
 
 /**
  * Handles the registration of a new user.
@@ -92,12 +88,12 @@ async function logoutHandler(req: Request, res: Response) {
  */
 async function userHandler(req: Request, res: Response) {
   const { username } = req.user!
-  const user = await getUser({ username })
+  const user = await expandUser(username)
   if (!user) {
     return badRequest(res, 'No user data was found')
   }
 
-  return res.json(userDTO(user))
+  return res.json(userDto(user))
 }
 
 const router = Router()

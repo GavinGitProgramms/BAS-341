@@ -73,6 +73,11 @@ export type Appointment = BaseEntity<{
    * The date and time that the appointment will end.
    */
   end_time: Date
+
+  /**
+   * Whether the appointment has been canceled.
+   */
+  canceled: boolean
 }>
 
 export type Qualification = {

@@ -1,8 +1,10 @@
 import {
   BookAppointmentArgs,
+  CancelAppointmentArgs,
   CreateAppointmentArgs,
   UserType,
   bookAppointment,
+  cancelAppointment,
   createAppointment,
   getAppointment,
   searchAppointments,
@@ -162,11 +164,39 @@ async function bookAppointmentHandler(
   }
 }
 
+/**
+ * Handler function for cancelling an appointment.
+ *
+ * @param req - The request object containing the appointment cancellation arguments.
+ * @param res - The response object to send the appointment cancellation result.
+ * @returns A JSON response containing the cancelled appointment.
+ */
+async function cancelAppointmentHandler(
+  req: Request<Omit<CancelAppointmentArgs, 'user'>>,
+  res: Response,
+) {
+  const { username } = req.user!
+  try {
+    const cancelAppointmentArgs: CancelAppointmentArgs = {
+      ...req.body,
+      user: username,
+    }
+
+    const appointment = await cancelAppointment(cancelAppointmentArgs)
+    res.json({ appointment })
+  } catch (err) {
+    const errMsg = `failed to cancel appointment because: ${err}`
+    console.error(errMsg)
+    return badRequest(res, 'Failed to cancel appointment')
+  }
+}
+
 const router = Router()
 router.get('/', ensureAuthenticated, getBookedAppointmentsHandler)
-router.get('/all', ensureAuthenticated, getAllAppointmentsHandler)
-router.get('/:appointmentId', ensureAuthenticated, getAppointmentHandler)
 router.post('/', ensureAuthenticated, createAppointmentHandler)
+router.get('/all', ensureAuthenticated, getAllAppointmentsHandler)
 router.post('/book', ensureAuthenticated, bookAppointmentHandler)
+router.post('/cancel', ensureAuthenticated, cancelAppointmentHandler)
+router.get('/:appointmentId', ensureAuthenticated, getAppointmentHandler)
 
 export default router

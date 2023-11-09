@@ -87,3 +87,13 @@ export type BookAppointmentArgs = {
   /** The user associated with the appointment. */
   user: User | string
 }
+
+/**
+ * Arguments for canceling an appointment.
+ */
+export type CancelAppointmentArgs = {
+  /** The ID of the appointment. */
+  id: string
+  /** The user associated with the appointment. */
+  user: User | string
+}

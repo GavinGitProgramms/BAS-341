@@ -1,7 +1,7 @@
 import { CreateQualificationArgs, createQualification } from 'bas-db'
 import { Request, Response, Router } from 'express'
 import { ensureAuthenticated } from '../middleware'
-import { badRequest, userDTO } from '../utils'
+import { badRequest } from '../utils'
 
 /**
  * Handler function for creating a service provider qualification.
@@ -26,7 +26,7 @@ async function createQualificationHandler(
       return badRequest(res, 'Failed to create qualification')
     }
 
-    res.json({ user: userDTO(user) })
+    res.json({ user })
   } catch (err) {
     const errMsg = `failed to create qualification for user: '${username}', because: ${err}`
     console.error(errMsg)

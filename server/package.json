@@ -4,7 +4,6 @@
   "description": "the web api for bas",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node --files src/server.ts",
     "build": "tsc",
     "watch": "tsc --watch",
     "logs": "pm2 logs",

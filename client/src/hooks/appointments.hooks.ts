@@ -3,8 +3,8 @@ import api from '../api'
 import {
   Appointment,
   BookAppointmentArgs,
+  CancelAppointmentArgs,
   CreateAppointmentArgs,
-  UnbookAppointmentArgs,
   UserType,
 } from '../types'
 import { useUser } from './user.hooks'
@@ -13,7 +13,7 @@ const ALL_APPOINTMENTS_URL = '/appointment/all'
 const GET_APPOINTMENT_URL = '/appointment'
 const CREATE_APPOINTMENT_URL = '/appointment'
 const BOOK_APPOINTMENT_URL = '/appointment/book'
-const UNBOOK_APPOINTMENT_URL = '/appointment/unbook'
+const CANCEL_APPOINTMENT_URL = '/appointment/cancel'
 
 export function useAppointments() {
   const { isAuthenticated, user } = useUser()
@@ -92,13 +92,13 @@ export function useAppointments() {
     }
   }
 
-  async function unbookAppointment(args: UnbookAppointmentArgs) {
-    if (!isAuthenticated || user?.type !== UserType.REGULAR) {
+  async function cancelAppointment(args: CancelAppointmentArgs) {
+    if (!isAuthenticated) {
       return
     }
 
     try {
-      const response = await api.post(UNBOOK_APPOINTMENT_URL, args)
+      const response = await api.post(CANCEL_APPOINTMENT_URL, args)
 
       // TODO: handle errors
       if (response.status === 200 || response.status === 201) {
@@ -123,6 +123,6 @@ export function useAppointments() {
     searchAppointments,
     createAppointment,
     bookAppointment,
-    unbookAppointment,
+    cancelAppointment,
   }
 }

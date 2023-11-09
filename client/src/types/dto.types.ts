@@ -42,6 +42,14 @@ export type BookAppointmentArgs = {
 }
 
 /**
+ * Arguments for canceling an appointment.
+ */
+export type CancelAppointmentArgs = {
+  /** The ID of the appointment. */
+  id: string
+}
+
+/**
  * Arguments for unbooking an appointment.
  *
  * This is for use by regular users only.
