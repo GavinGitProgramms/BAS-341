@@ -32,8 +32,8 @@ export default function Schedule() {
   return (
     <Layout>
       <div className="container p-6 mx-auto">
-        <div className="flex flex-wrap -mx-2">
-          <div className="w-full md:w-1/2 px-2 mb-4">
+        <div className="flex flex-col items-center -mx-2">
+          <div className="w-full md:w-2/3 px-2 mb-4">
             <div className="card bg-base-200  shadow-xl h-auto">
               <figure className="h-48 overflow-hidden">
                 <img
@@ -56,8 +56,8 @@ export default function Schedule() {
               </div>
             </div>
           </div>
-
-          <div className="w-full md:w-1/2 px-2 mb-4">
+          
+          <div className="w-full md:w-2/3 px-2 mb-4">
             <div className="card bg-base-200 shadow-xl h-auto">
               <figure className="h-48 overflow-hidden">
                 <img

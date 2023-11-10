@@ -93,6 +93,9 @@ export default function AppointmentsTable({
               {renderHeaderCell('Type', 'type')}
               {user?.type === UserType.REGULAR &&
                 renderHeaderCell('Provider', 'provider')}
+              {user?.type === UserType.SERVICE_PROVIDER &&
+                renderHeaderCell('User', 'user')}
+              {renderHeaderCell('Description', 'description')}
               {renderHeaderCell('Start Time', 'start_time')}
               {renderHeaderCell('End Time', 'end_time')}
               {isProviderView && renderHeaderCell('Booked', 'isBooked')}
@@ -112,6 +115,14 @@ export default function AppointmentsTable({
                     {appointment.provider?.username}
                   </td>
                 )}
+                {user?.type === UserType.SERVICE_PROVIDER && (
+                  <td className="px-6 py-4">
+                    {appointment.user?.username}
+                  </td>
+                )}
+                <td className="px-6 py-4">
+                  {appointment.description}
+                </td>
                 <td className="px-6 py-4">
                   {new Date(appointment.start_time).toLocaleString()}
                 </td>
