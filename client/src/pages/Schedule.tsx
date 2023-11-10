@@ -77,8 +77,13 @@ export default function Schedule() {
               <div className="card-body">
                 <div className="flex">
                   <h2 className="card-title w-1/3">{appointmentsTitle}</h2>
-                  <h3 className='w-20'>Search:</h3>
-                  <input value={query} onChange={e => setQuery(e.target.value)} type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
+                  {user && user.type === UserType.SERVICE_PROVIDER ? (<></>):(
+                    <>
+                      <h3 className='w-20'>Search:</h3>
+                      <input value={query} onChange={e => setQuery(e.target.value)} type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
+                    </>
+                  )}
+                  
                 </div>
                 {user && user.type === UserType.SERVICE_PROVIDER ? (
                   <CreateAppointmentForm onSubmit={createAppointment} />
