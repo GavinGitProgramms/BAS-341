@@ -42,7 +42,7 @@ export default function Appointment() {
     window.history.back()
   }
 
-  const isProviderView = user?.type === UserType.SERVICE_PROVIDER
+  const isProviderView = user?.type === UserType.SERVICE_PROVIDER || user?.type === UserType.ADMIN
 
   return (
     <Layout>

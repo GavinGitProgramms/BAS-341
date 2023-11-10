@@ -6,11 +6,12 @@ import { UserType } from '../types' // Import UserType enum
 import CreateAppointmentForm from '../components/CreateAppointmentForm'
 import AppointmentsTable from '../components/AppointmentsTable'
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 export default function Schedule() {
   const { user } = useUser()
-  const [show, setShow] = useState(true)
+  const [query, setQuery] = useState("")
+  const inputRef = useRef()
   const navigate = useNavigate()
   const { appointments, createAppointment } = useAppointments()
 
@@ -26,6 +27,10 @@ export default function Schedule() {
   const unbookedAppointments = appointments.filter(
     (appointment) => !appointment.user,
   )
+
+  const filteredAppointments = unbookedAppointments.filter(appointment => {
+    return appointment.description.toLocaleLowerCase().includes(query.toLocaleLowerCase())
+  } )
 
   function handleRowClick(appointmentId: string) {
     navigate(`/appointment/${appointmentId}`)
@@ -70,21 +75,24 @@ export default function Schedule() {
                 />
               </figure>
               <div className="card-body">
-                <h2 className="card-title">{appointmentsTitle}</h2>
+                <div className="flex">
+                  <h2 className="card-title w-1/3">{appointmentsTitle}</h2>
+                  <h3 className='w-20'>Search:</h3>
+                  <input value={query} onChange={e => setQuery(e.target.value)} type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
+                </div>
                 {user && user.type === UserType.SERVICE_PROVIDER ? (
                   <CreateAppointmentForm onSubmit={createAppointment} />
                 ) : (
                   // For regular users, show a table of appointments that haven't been booked yet
                     <AppointmentsTable
                       onClick={handleRowClick}
-                      appointments={unbookedAppointments}
+                      appointments={filteredAppointments}
                     />
                 )}
               </div>
             </div>
           </div>
           )}
-          
         </div>
       </div>
     </Layout>

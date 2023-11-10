@@ -120,7 +120,7 @@ export default function AppointmentsTable({
                     {appointment.user?.username}
                   </td>
                 )}
-                <td className="px-6 py-4">
+                <td className="px-6 py-4 text-ellipsis overflow-hidden">
                   {appointment.description}
                 </td>
                 <td className="px-6 py-4">
