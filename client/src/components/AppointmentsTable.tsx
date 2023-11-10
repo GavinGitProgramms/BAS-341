@@ -91,9 +91,9 @@ export default function AppointmentsTable({
           <thead>
             <tr className="select-none">
               {renderHeaderCell('Type', 'type')}
-              {user?.type === UserType.REGULAR &&
+              {(user?.type === UserType.REGULAR || user?.type === UserType.ADMIN) &&
                 renderHeaderCell('Provider', 'provider')}
-              {user?.type === UserType.SERVICE_PROVIDER &&
+              {(user?.type === UserType.SERVICE_PROVIDER || user?.type === UserType.ADMIN) &&
                 renderHeaderCell('User', 'user')}
               {renderHeaderCell('Description', 'description')}
               {renderHeaderCell('Start Time', 'start_time')}
@@ -110,12 +110,12 @@ export default function AppointmentsTable({
                 onClick={onClick && handleRowClick(appointment.id)}
               >
                 <td className="px-6 py-4">{toTitleCase(appointment.type)}</td>
-                {user?.type === UserType.REGULAR && (
+                {(user?.type === UserType.REGULAR || user?.type === UserType.ADMIN) && (
                   <td className="px-6 py-4">
                     {appointment.provider?.username}
                   </td>
                 )}
-                {user?.type === UserType.SERVICE_PROVIDER && (
+                {(user?.type === UserType.SERVICE_PROVIDER || user?.type === UserType.ADMIN) && (
                   <td className="px-6 py-4">
                     {appointment.user?.username}
                   </td>

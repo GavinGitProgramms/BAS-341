@@ -6,9 +6,11 @@ import { UserType } from '../types' // Import UserType enum
 import CreateAppointmentForm from '../components/CreateAppointmentForm'
 import AppointmentsTable from '../components/AppointmentsTable'
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 
 export default function Schedule() {
   const { user } = useUser()
+  const [show, setShow] = useState(true)
   const navigate = useNavigate()
   const { appointments, createAppointment } = useAppointments()
 
@@ -57,7 +59,8 @@ export default function Schedule() {
             </div>
           </div>
           
-          <div className="w-full md:w-2/3 px-2 mb-4">
+          {user && user.type === UserType.ADMIN ? (<></>) : (
+            <div className="w-full md:w-2/3 px-2 mb-4">
             <div className="card bg-base-200 shadow-xl h-auto">
               <figure className="h-48 overflow-hidden">
                 <img
@@ -72,14 +75,16 @@ export default function Schedule() {
                   <CreateAppointmentForm onSubmit={createAppointment} />
                 ) : (
                   // For regular users, show a table of appointments that haven't been booked yet
-                  <AppointmentsTable
-                    onClick={handleRowClick}
-                    appointments={unbookedAppointments}
-                  />
+                    <AppointmentsTable
+                      onClick={handleRowClick}
+                      appointments={unbookedAppointments}
+                    />
                 )}
               </div>
             </div>
           </div>
+          )}
+          
         </div>
       </div>
     </Layout>
