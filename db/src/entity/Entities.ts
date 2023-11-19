@@ -22,6 +22,19 @@ export enum AppointmentType {
   MEDICAL = 'MEDICAL',
 }
 
+export enum EventType {
+  APPOINTMENT_CREATED = 'APPOINTMENT_CREATED',
+  APPOINTMENT_CANCELED = 'APPOINTMENT_CANCELED',
+  APPOINTMENT_UPDATED = 'APPOINTMENT_UPDATED',
+  APPOINTMENT_BOOKED = 'APPOINTMENT_BOOKED',
+}
+
+export enum NotificationType {
+  APP = 'APP',
+  SMS = 'SMS',
+  EMAIL = 'EMAIL',
+}
+
 @Entity({ schema: 'public', name: 'user' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -64,6 +77,11 @@ export class User {
   })
   qualifications: Qualification[]
 
+  @OneToMany(() => Notification, (notification) => notification.user, {
+    cascade: true,
+  })
+  notifications: Notification[]
+
   @CreateDateColumn()
   created_date: Date
 
@@ -86,11 +104,11 @@ export class Appointment {
   description: string
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'provider_id' })
   provider: User
 
   @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'provider_id' })
+  @JoinColumn({ name: 'user_id' })
   user: User | null
 
   @Column({ type: 'timestamp' })
@@ -120,4 +138,44 @@ export class Qualification {
   @ManyToOne(() => User, (user) => user.qualifications)
   @JoinColumn({ name: 'user_id' })
   user: User
+}
+
+@Entity({ schema: 'public', name: 'event' })
+export class Event {
+  @PrimaryGeneratedColumn('uuid')
+  id: string
+
+  @Column({
+    type: 'enum',
+    enum: EventType,
+  })
+  type: EventType
+
+  @Column('jsonb', { nullable: false, default: {} })
+  payload: Record<string, any>
+
+  @CreateDateColumn()
+  created_date: Date
+}
+
+@Entity({ schema: 'public', name: 'notification' })
+export class Notification {
+  @PrimaryGeneratedColumn('uuid')
+  id: string
+
+  @Column({
+    type: 'enum',
+    enum: NotificationType,
+  })
+  type: NotificationType
+
+  @ManyToOne(() => User, (user) => user.notifications)
+  @JoinColumn({ name: 'user_id' })
+  user: User
+
+  @Column()
+  message: string
+
+  @CreateDateColumn()
+  created_date: Date
 }

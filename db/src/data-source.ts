@@ -1,12 +1,9 @@
 import 'reflect-metadata'
 import { DataSource } from 'typeorm'
-import { Appointment, Qualification, User } from './entity'
-import {
-  Migration1696986519515,
-  AddAppointmentCanceled1699546327331,
-} from './migration'
+import { Appointment, Event, Notification, Qualification, User } from './entity'
+import { Migration1700435027666 } from './migration'
 
-const migrations = [Migration1696986519515, AddAppointmentCanceled1699546327331]
+const migrations = [Migration1700435027666]
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -17,7 +14,7 @@ export const AppDataSource = new DataSource({
   database: 'test',
   synchronize: true,
   logging: false,
-  entities: [User, Appointment, Qualification],
+  entities: [Appointment, Event, Notification, Qualification, User],
   migrations,
   subscribers: [],
 })
