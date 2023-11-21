@@ -158,6 +158,11 @@ export async function createAppointment({
     throw new Error('start time cannot be after end time')
   }
 
+  // Ensure that the appointment is created in the future
+  if (start_time < new Date()) {
+    throw new Error('appointment start time must be in the future')
+  }
+
   appointment.start_time = start_time
   appointment.end_time = end_time
 
