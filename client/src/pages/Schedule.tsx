@@ -20,6 +20,8 @@ export default function Schedule() {
       ? 'Create an Appointment'
       : 'Book an Appointment'
 
+  const listTitle = user && user.type === UserType.ADMIN ? 'All Appointments' : 'Your Appointments'
+
   const bookedAppointments = appointments.filter(
     (appointment) => appointment.user?.username === user?.username,
   )
@@ -50,7 +52,7 @@ export default function Schedule() {
                 />
               </figure>
               <div className="card-body">
-                <h2 className="card-title">Your Schedule</h2>
+                <h2 className="card-title">{listTitle}</h2>
                 {/* For regular users, show a table of appointments that they have booked */}
                 <AppointmentsTable
                   onClick={handleRowClick}
@@ -63,7 +65,7 @@ export default function Schedule() {
               </div>
             </div>
           </div>
-          
+
           {user && user.type === UserType.ADMIN ? (<></>) : (
             <div className="w-full md:w-2/3 px-2 mb-4">
             <div className="card bg-base-200 shadow-xl h-auto">
@@ -79,11 +81,11 @@ export default function Schedule() {
                   <h2 className="card-title w-1/3">{appointmentsTitle}</h2>
                   {user && user.type === UserType.SERVICE_PROVIDER ? (<></>):(
                     <>
-                      <h3 className='w-20'>Search:</h3>
+                      <h3 className='w-20 flex justify-center items-center'>Search:</h3>
                       <input value={query} onChange={e => setQuery(e.target.value)} type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
                     </>
                   )}
-                  
+
                 </div>
                 {user && user.type === UserType.SERVICE_PROVIDER ? (
                   <CreateAppointmentForm onSubmit={createAppointment} />

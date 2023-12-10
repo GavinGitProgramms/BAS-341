@@ -126,7 +126,7 @@ export async function searchAppointments({
  *
  * @param {CreateAppointmentArgs} args - The arguments needed to create an appointment.
  * @returns {Promise<AppointmentDto>} - The newly created appointment.
- * @throws {Error} - If the appointment type is invalid, the provider does not exist, the user is not a service provider, or the start time is after the end time.
+ * @throws {Error} - If the appointment type is invalid, the provider does not exist, the user is not a service provider, the start time is after the end time, or the start time is not in the future.
  */
 export async function createAppointment({
   type,
