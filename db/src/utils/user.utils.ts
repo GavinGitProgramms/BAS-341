@@ -117,6 +117,10 @@ export async function searchUsers(
     whereOptions['email'] = likeStr(dto.email)
   }
 
+  if (dto.enabled !== undefined) {
+    whereOptions['enabled'] = dto.enabled
+  }
+
   // Pagination and sorting
   const skip = (dto.page - 1) * dto.rowsPerPage
   const take = dto.rowsPerPage

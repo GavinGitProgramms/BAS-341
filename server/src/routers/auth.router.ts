@@ -115,6 +115,7 @@ async function searchUsersHandler(req: Request, res: Response) {
       rowsPerPage: parseInt(req.query.rowsPerPage as string, 10),
       sortField: req.query.sortField as string,
       sortDirection: req.query.sortDirection as SortDirection,
+      enabled: req.query.enabled === 'true',
     }
 
     const results = await searchUsers(dto, { user: username })

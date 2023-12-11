@@ -78,6 +78,7 @@ export type SearchUsersDto = {
   lastName?: string
   phoneNumber?: string
   email?: string
+  enabled?: boolean
 } & EntitySearchOptions
 
 export type UserDto = Omit<User, 'password_hash'>

@@ -31,6 +31,7 @@ export function useUsersSearch(initialSearchParams?: Partial<SearchUsersDto>) {
     lastName: undefined,
     phoneNumber: undefined,
     email: undefined,
+    enabled: true,
     ...(initialSearchParams || {}),
   })
 

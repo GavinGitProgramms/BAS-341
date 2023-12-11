@@ -9,6 +9,7 @@ import authRouter from './routers/auth.router'
 import providerRouter from './routers/provider.router'
 
 const app = express()
+app.disable('x-powered-by')
 
 const PORT = process.env.PORT || 3000
 

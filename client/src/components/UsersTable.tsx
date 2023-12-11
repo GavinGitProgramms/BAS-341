@@ -1,17 +1,15 @@
 import { useUsersSearch, useUser } from '../hooks'
-import { UserDto, UserType, SearchUsersDto } from '../types'
+import { UserType, SearchUsersDto } from '../types'
 import { toTitleCase } from '../utils'
 
 export type UsersTableProps = {
   initialSearchParams?: Partial<SearchUsersDto>
   onClick?: (userId: string) => void
-  filterRows?: (row: UserDto) => boolean
 }
 
 export default function UsersTable({
   initialSearchParams,
   onClick,
-  filterRows,
 }: UsersTableProps) {
   const { user } = useUser()
   const { users, searchParams, setSearchParams } =
@@ -123,6 +121,25 @@ export default function UsersTable({
             className="input input-bordered w-full"
           />
         </div>
+        <div className="form-control w-full">
+          <label className="label" htmlFor="enabled">
+            <span className="label-text">Enabled</span>
+          </label>
+          <select
+            id="enabled"
+            name="enabled"
+            value={
+              searchParams.enabled !== undefined
+                ? String(searchParams.enabled)
+                : ''
+            }
+            onChange={handleInputChange}
+            className="select select-bordered w-full"
+          >
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </div>
       </form>
     )
   }
@@ -157,10 +174,6 @@ export default function UsersTable({
     }
   }
 
-  const filteredUsers = filterRows
-    ? users.results.filter(filterRows)
-    : users.results
-
   return (
     <>
       {renderSearchForm()}
@@ -177,7 +190,7 @@ export default function UsersTable({
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user) => (
+            {users.results.map((user) => (
               <tr
                 key={user.username}
                 className={onClick ? 'hover:bg-base-100 cursor-pointer' : ''}

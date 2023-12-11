@@ -26,4 +26,5 @@ export type SearchUsersDto = {
   lastName?: string
   phoneNumber?: string
   email?: string
+  enabled?: boolean
 } & EntitySearchOptions
