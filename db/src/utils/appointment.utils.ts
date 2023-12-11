@@ -1,4 +1,12 @@
-import { FindOneOptions, FindOptionsWhere, IsNull } from 'typeorm'
+import {
+  FindOneOptions,
+  FindOptionsOrder,
+  FindOptionsWhere,
+  IsNull,
+  LessThanOrEqual,
+  Like,
+  MoreThanOrEqual,
+} from 'typeorm'
 import { AppDataSource } from '../data-source'
 import { Appointment, AppointmentType, UserType } from '../entity'
 import type {
@@ -7,7 +15,9 @@ import type {
   CancelAppointmentArgs,
   CreateAppointmentArgs,
   GetAppointmentArgs,
-  SearchAppointmentsArgs,
+  SearchAppointmentsDto,
+  SearchContext,
+  SearchResults,
 } from '../types'
 import { ensureInitialized } from './db.utils'
 import { expandUser, userDto } from './user.utils'
@@ -70,22 +80,25 @@ export async function getAppointment({
 }
 
 /**
- * Searches for appointments based on the provided arguments.
+ * Searches for appointments based on the provided DTO and user context.
  *
- * If the includeAllUnbooked argument is true, then all unbooked appointments
- * for all service providers are returned in addition to the appointments for
- * the given user.
- *
- * @param {SearchAppointmentsArgs} args - The arguments to use for the search.
- * @returns {Promise<AppointmentDto[]>} - A promise that resolves to an array of appointments.
+ * @param {SearchAppointmentsDto} dto - The DTO containing search parameters.
+ * @param {SearchContext} context - The context of the user performing the search.
+ * @returns {Promise<SearchResults>} - A promise that resolves to the search results.
  */
-export async function searchAppointments({
-  user,
-  includeAllUnbooked = false,
-}: SearchAppointmentsArgs): Promise<AppointmentDto[]> {
+export async function searchAppointments(
+  dto: SearchAppointmentsDto,
+  context: SearchContext,
+): Promise<SearchResults<AppointmentDto>> {
   await ensureInitialized()
   const appointmentRepo = AppDataSource.getRepository(Appointment)
-  const whereOptions: Array<FindOptionsWhere<Appointment>> = []
+
+  // Constructing where conditions based on DTO
+  const mainWhereOptions: FindOptionsWhere<Appointment> = {}
+  const altWhereOptions: FindOptionsWhere<Appointment> = {}
+  const filterWhereOptions: FindOptionsWhere<Appointment> = {}
+
+  const allWhereOptions: Array<FindOptionsWhere<Appointment>> = []
 
   const relations = {
     user: true,
@@ -94,29 +107,106 @@ export async function searchAppointments({
     },
   }
 
-  if (typeof user === 'string') {
-    user = await expandUser(user)
+  const requestingUser = await expandUser(context.user)
+
+  // Implementing user role-based logic
+  switch (requestingUser.type) {
+    case UserType.REGULAR:
+      // Regular users can only see their appointments (even cancled ones)
+      mainWhereOptions['user'] = { id: requestingUser.id }
+
+      // Allow for all unbooked appointments to be returned
+      altWhereOptions['user'] = IsNull()
+      altWhereOptions['canceled'] = false
+      break
+    case UserType.SERVICE_PROVIDER:
+      // Service providers can only see appointments they created
+      mainWhereOptions['provider'] = { id: requestingUser.id }
+      break
+    case UserType.ADMIN:
+      // Admins can see all appointments
+      break
   }
 
-  if (includeAllUnbooked && user.type === UserType.REGULAR) {
-    // Get all unbooked and non-canceled appointments for all service providers
-    whereOptions.push({ user: IsNull(), canceled: false })
+  // Adding additional filters from DTO
+  if (dto.userId) {
+    if (requestingUser.type !== UserType.REGULAR) {
+      filterWhereOptions['user'] = { username: Like(`%${dto.userId}%`) }
+    }
   }
 
-  // If the user is a regular user, then we need to search by the user field.
-  // Otherwise, we need to search by the provider field.
-  if (user.type === UserType.REGULAR) {
-    whereOptions.push({ user: { id: user.id } })
-  } else if (user.type === UserType.SERVICE_PROVIDER) {
-    whereOptions.push({ provider: { id: user.id } })
+  if (dto.providerId) {
+    if (requestingUser.type !== UserType.SERVICE_PROVIDER) {
+      filterWhereOptions['provider'] = {
+        username: Like(`%${dto.providerId}%`),
+      }
+    }
+  }
+
+  if (dto.type) {
+    filterWhereOptions['type'] = dto.type
+  }
+
+  if (dto.description) {
+    filterWhereOptions['description'] = Like(`%${dto.description}%`)
+  }
+
+  if (dto.startTime) {
+    filterWhereOptions['start_time'] = MoreThanOrEqual(new Date(dto.startTime))
+  }
+
+  if (dto.endTime) {
+    filterWhereOptions['end_time'] = LessThanOrEqual(new Date(dto.endTime))
+  }
+
+  if (dto.canceled !== undefined) {
+    filterWhereOptions['canceled'] = dto.canceled
+  }
+
+  // Pagination and sorting
+  const skip = (dto.page - 1) * dto.rowsPerPage
+  const take = dto.rowsPerPage
+
+  const order: FindOptionsOrder<Appointment> =
+    dto.sortField === 'user'
+      ? {
+          user: { username: dto.sortDirection },
+        }
+      : dto.sortField === 'provider'
+      ? {
+          provider: { username: dto.sortDirection },
+        }
+      : {
+          [dto.sortField]: dto.sortDirection,
+        }
+
+  allWhereOptions.push({ ...mainWhereOptions, ...filterWhereOptions })
+  if (Object.keys(altWhereOptions).length > 0) {
+    allWhereOptions.push({ ...altWhereOptions, ...filterWhereOptions })
+    if (requestingUser.type === UserType.REGULAR) {
+      // Regular users can't search for unbooked appointments that have been canceled
+      allWhereOptions[1]['canceled'] = false
+    }
   }
 
   const appointments = await appointmentRepo.find({
-    where: whereOptions,
+    where: allWhereOptions,
     relations,
+    order,
+    skip,
+    take,
   })
 
-  return appointments.map(appointmentDto)
+  // Count total appointments
+  const total = await appointmentRepo.count({
+    where: allWhereOptions,
+  })
+
+  // Map to DTOs and return results with total
+  return {
+    total: total,
+    results: appointments.map(appointmentDto),
+  }
 }
 
 /**
@@ -126,7 +216,7 @@ export async function searchAppointments({
  *
  * @param {CreateAppointmentArgs} args - The arguments needed to create an appointment.
  * @returns {Promise<AppointmentDto>} - The newly created appointment.
- * @throws {Error} - If the appointment type is invalid, the provider does not exist, the user is not a service provider, the start time is after the end time, or the start time is not in the future.
+ * @throws {Error} - If the provider does not exist, the user is not a service provider, the start time is after the end time, or the start time is not in the future.
  */
 export async function createAppointment({
   type,

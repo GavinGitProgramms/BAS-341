@@ -1,4 +1,5 @@
-import { AppointmentType, UserType } from './entity.types'
+import { Appointment, AppointmentType, User, UserType } from './entity.types'
+import { EntitySearchOptions } from './search.types'
 
 export type LoginArgs = { username: string; password: string }
 
@@ -57,4 +58,21 @@ export type CancelAppointmentArgs = {
 export type UnbookAppointmentArgs = {
   /** The ID of the appointment. */
   id: string
+}
+
+export type SearchAppointmentsDto = {
+  userId?: string
+  providerId?: string
+  type?: AppointmentType
+  description?: string
+  startTime?: string
+  endTime?: string
+  canceled?: boolean
+} & EntitySearchOptions
+
+export type UserDto = Omit<User, 'password_hash'>
+
+export type AppointmentDto = Omit<Appointment, 'user' | 'provider'> & {
+  user: UserDto | null
+  provider: UserDto | null
 }

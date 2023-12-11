@@ -2,23 +2,113 @@ import { useEffect, useState } from 'react'
 import api from '../api'
 import {
   Appointment,
+  AppointmentDto,
   BookAppointmentArgs,
   CancelAppointmentArgs,
   CreateAppointmentArgs,
+  EventType,
+  SearchAppointmentsDto,
+  SearchResults,
   UserType,
 } from '../types'
+import { useEvents } from './event.hooks'
 import { useUser } from './user.hooks'
 
-const ALL_APPOINTMENTS_URL = '/appointment/all'
+const SEARCH_APPOINTMENTS_URL = '/appointment/search'
 const GET_APPOINTMENT_URL = '/appointment'
 const CREATE_APPOINTMENT_URL = '/appointment'
 const BOOK_APPOINTMENT_URL = '/appointment/book'
 const CANCEL_APPOINTMENT_URL = '/appointment/cancel'
 
+export function useAppointmentsSearch(
+  initialSearchParams?: Partial<SearchAppointmentsDto>,
+) {
+  const { isAuthenticated } = useUser()
+  const { subscribe, unsubscribe } = useEvents()
+
+  const [appointments, setAppointments] = useState<
+    SearchResults<AppointmentDto>
+  >({ total: 0, results: [] })
+
+  const [searchParams, setSearchParams] = useState<SearchAppointmentsDto>({
+    page: 1,
+    rowsPerPage: 5,
+    sortField: 'start_time',
+    sortDirection: 'asc',
+    userId: undefined,
+    providerId: undefined,
+    type: undefined,
+    description: undefined,
+    startTime: undefined,
+    endTime: undefined,
+    canceled: false,
+    ...(initialSearchParams || {}),
+  })
+
+  async function searchAppointments(searchParams?: SearchAppointmentsDto) {
+    if (!isAuthenticated) {
+      setAppointments({ total: 0, results: [] })
+      return
+    }
+
+    try {
+      // Constructing query string from searchParams
+      const queryParams = new URLSearchParams()
+      Object.entries(searchParams || {}).forEach(([key, value]) => {
+        if (value !== undefined) {
+          queryParams.append(key, value.toString())
+        }
+      })
+
+      const response = await api.get(
+        `${SEARCH_APPOINTMENTS_URL}?${queryParams.toString()}`,
+      )
+
+      if (response.status === 200) {
+        // Assuming the API now returns an object with 'results' and 'total'
+        setAppointments(response.data)
+      }
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  useEffect(() => {
+    function onEvent() {
+      searchAppointments(searchParams)
+    }
+
+    subscribe(EventType.APPOINTMENT_CREATED, onEvent)
+    subscribe(EventType.APPOINTMENT_BOOKED, onEvent)
+    subscribe(EventType.APPOINTMENT_CANCELED, onEvent)
+    subscribe(EventType.APPOINTMENT_UPDATED, onEvent)
+
+    return () => {
+      unsubscribe(EventType.APPOINTMENT_CREATED, onEvent)
+      unsubscribe(EventType.APPOINTMENT_BOOKED, onEvent)
+      unsubscribe(EventType.APPOINTMENT_CANCELED, onEvent)
+      unsubscribe(EventType.APPOINTMENT_UPDATED, onEvent)
+    }
+  }, [searchParams])
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setAppointments({ total: 0, results: [] })
+    } else {
+      searchAppointments(searchParams)
+    }
+  }, [isAuthenticated, searchParams])
+
+  return {
+    appointments,
+    searchParams,
+    setSearchParams,
+  }
+}
+
 export function useAppointments() {
   const { isAuthenticated, user } = useUser()
-
-  const [appointments, setAppointments] = useState<Appointment[]>([])
+  const { publish } = useEvents()
 
   async function getAppointment(
     appointmentId: string,
@@ -30,7 +120,6 @@ export function useAppointments() {
     try {
       const response = await api.get(`${GET_APPOINTMENT_URL}/${appointmentId}`)
       if (response.status === 200) {
-        setAppointments(response.data.appointments)
         return response.data.appointment
       } else {
         return null
@@ -38,23 +127,6 @@ export function useAppointments() {
     } catch (err) {
       console.error(err)
       return null
-    }
-  }
-
-  async function searchAppointments() {
-    if (!isAuthenticated) {
-      return
-    }
-
-    try {
-      const response = await api.get(ALL_APPOINTMENTS_URL)
-
-      // TODO: handle errors
-      if (response.status === 200) {
-        setAppointments(response.data.appointments)
-      }
-    } catch (err) {
-      console.error(err)
     }
   }
 
@@ -68,7 +140,7 @@ export function useAppointments() {
 
       // TODO: handle errors
       if (response.status === 200 || response.status === 201) {
-        await searchAppointments()
+        publish(EventType.APPOINTMENT_CREATED)
       }
     } catch (err) {
       console.error(err)
@@ -85,7 +157,7 @@ export function useAppointments() {
 
       // TODO: handle errors
       if (response.status === 200 || response.status === 201) {
-        await searchAppointments()
+        publish(EventType.APPOINTMENT_BOOKED)
       }
     } catch (err) {
       console.error(err)
@@ -102,25 +174,15 @@ export function useAppointments() {
 
       // TODO: handle errors
       if (response.status === 200 || response.status === 201) {
-        await searchAppointments()
+        publish(EventType.APPOINTMENT_CANCELED)
       }
     } catch (err) {
       console.error(err)
     }
   }
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setAppointments([])
-    } else {
-      searchAppointments()
-    }
-  }, [isAuthenticated])
-
   return {
-    appointments,
     getAppointment,
-    searchAppointments,
     createAppointment,
     bookAppointment,
     cancelAppointment,

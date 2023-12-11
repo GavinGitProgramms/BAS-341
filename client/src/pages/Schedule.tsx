@@ -1,49 +1,49 @@
-import { useUser, useAppointments } from '../hooks'
-import ScheduleImg from '../images/Schedule.png' // Placeholder image for qualifications card
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import AppointmentsTable from '../components/AppointmentsTable'
+import CreateAppointmentForm from '../components/CreateAppointmentForm'
+import { useAppointments, useUser } from '../hooks'
 import AppointmentImg from '../images/Appointment.png' // Placeholder image for qualifications card
+import ScheduleImg from '../images/Schedule.png' // Placeholder image for qualifications card
 import Layout from '../layout/Layout'
 import { UserType } from '../types' // Import UserType enum
-import CreateAppointmentForm from '../components/CreateAppointmentForm'
-import AppointmentsTable from '../components/AppointmentsTable'
-import { useNavigate } from 'react-router-dom'
-import { useRef, useState } from 'react'
 
 export default function Schedule() {
   const { user } = useUser()
-  const [query, setQuery] = useState("")
-  const inputRef = useRef()
+  const [query, setQuery] = useState('')
   const navigate = useNavigate()
-  const { appointments, createAppointment } = useAppointments()
+  const { createAppointment } = useAppointments()
 
   const appointmentsTitle =
     user && user.type === UserType.SERVICE_PROVIDER
       ? 'Create an Appointment'
       : 'Book an Appointment'
 
-  const listTitle = user && user.type === UserType.ADMIN ? 'All Appointments' : 'Your Appointments'
-
-  const bookedAppointments = appointments.filter(
-    (appointment) => appointment.user?.username === user?.username,
-  )
-
-  const unbookedAppointments = appointments.filter(
-    (appointment) => !appointment.user,
-  )
-
-  const filteredAppointments = unbookedAppointments.filter(appointment => {
-    return appointment.description.toLocaleLowerCase().includes(query.toLocaleLowerCase())
-  } )
+  const listTitle =
+    user && user.type === UserType.ADMIN
+      ? 'All Appointments'
+      : 'Your Appointments'
 
   function handleRowClick(appointmentId: string) {
     navigate(`/appointment/${appointmentId}`)
   }
 
+  useEffect(() => {
+    if (sessionStorage.getItem('scrollToTopOnBack') === 'true') {
+      // Scroll to the top
+      window.scrollTo(0, 0)
+
+      // Clear the flag
+      sessionStorage.removeItem('scrollToTopOnBack')
+    }
+  }, [])
+
   return (
     <Layout>
       <div className="container p-6 mx-auto">
         <div className="flex flex-col items-center -mx-2">
-          <div className="w-full md:w-2/3 px-2 mb-4">
-            <div className="card bg-base-200  shadow-xl h-auto">
+          <div className="w-full xl:w-2/3 px-2 mb-4">
+            <div className="card bg-base-200 shadow-xl h-auto">
               <figure className="h-48 overflow-hidden">
                 <img
                   src={ScheduleImg}
@@ -56,49 +56,45 @@ export default function Schedule() {
                 {/* For regular users, show a table of appointments that they have booked */}
                 <AppointmentsTable
                   onClick={handleRowClick}
-                  appointments={
-                    user?.type === UserType.REGULAR
-                      ? bookedAppointments
-                      : appointments
+                  filterRows={
+                    user && user.type === UserType.REGULAR
+                      ? (appointment) => Boolean(appointment.user)
+                      : undefined
                   }
                 />
               </div>
             </div>
           </div>
 
-          {user && user.type === UserType.ADMIN ? (<></>) : (
-            <div className="w-full md:w-2/3 px-2 mb-4">
-            <div className="card bg-base-200 shadow-xl h-auto">
-              <figure className="h-48 overflow-hidden">
-                <img
-                  src={AppointmentImg}
-                  alt="Appointment"
-                  className="w-full h-full object-cover"
-                />
-              </figure>
-              <div className="card-body">
-                <div className="flex">
-                  <h2 className="card-title w-1/3">{appointmentsTitle}</h2>
-                  {user && user.type === UserType.SERVICE_PROVIDER ? (<></>):(
-                    <>
-                      <h3 className='w-20 flex justify-center items-center'>Search:</h3>
-                      <input value={query} onChange={e => setQuery(e.target.value)} type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
-                    </>
-                  )}
-
-                </div>
-                {user && user.type === UserType.SERVICE_PROVIDER ? (
-                  <CreateAppointmentForm onSubmit={createAppointment} />
-                ) : (
-                  // For regular users, show a table of appointments that haven't been booked yet
+          {user && user.type === UserType.ADMIN ? (
+            <></>
+          ) : (
+            <div className="w-full xl:w-2/3 px-2 mb-4">
+              <div className="card bg-base-200 shadow-xl h-auto">
+                <figure className="h-48 overflow-hidden">
+                  <img
+                    src={AppointmentImg}
+                    alt="Appointment"
+                    className="w-full h-full object-cover"
+                  />
+                </figure>
+                <div className="card-body">
+                  <div className="flex">
+                    <h2 className="card-title w-1/3">{appointmentsTitle}</h2>
+                  </div>
+                  {user && user.type === UserType.SERVICE_PROVIDER ? (
+                    <CreateAppointmentForm onSubmit={createAppointment} />
+                  ) : (
+                    // For regular users, show a table of appointments that haven't been booked yet
                     <AppointmentsTable
+                      hideCanceledFilter
                       onClick={handleRowClick}
-                      appointments={filteredAppointments}
+                      filterRows={(appointment) => !appointment.user}
                     />
-                )}
+                  )}
+                </div>
               </div>
             </div>
-          </div>
           )}
         </div>
       </div>

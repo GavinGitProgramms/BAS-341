@@ -28,6 +28,7 @@ export default function Appointment() {
     await bookAppointment({ id: appointment.id })
 
     // Return the user to the last page they were on
+    sessionStorage.setItem('scrollToTopOnBack', 'true')
     window.history.back()
   }
 
@@ -42,7 +43,8 @@ export default function Appointment() {
     window.history.back()
   }
 
-  const isProviderView = user?.type === UserType.SERVICE_PROVIDER || user?.type === UserType.ADMIN
+  const isProviderView =
+    user?.type === UserType.SERVICE_PROVIDER || user?.type === UserType.ADMIN
 
   return (
     <Layout>

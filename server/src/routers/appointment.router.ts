@@ -1,7 +1,12 @@
 import {
+  AppointmentDto,
+  AppointmentType,
   BookAppointmentArgs,
   CancelAppointmentArgs,
   CreateAppointmentArgs,
+  SearchAppointmentsDto,
+  SearchResults,
+  SortDirection,
   UserType,
   bookAppointment,
   cancelAppointment,
@@ -14,52 +19,40 @@ import { ensureAuthenticated } from '../middleware'
 import { badRequest, notFoundRequest, unauthorizedRequest } from '../utils'
 
 /**
- * Handler function for retrieving all booked appointments for a user.
+ * Handles the searchAppointments request.
  *
- * Requires an authenticated user for access.
- * For use by regular users only.
- *
- * @param req - Express Request object.
- * @param res - Express Response object.
- * @returns Returns a JSON response containing the user's appointments.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns A JSON response with the search results of appointments.
  */
-async function getBookedAppointmentsHandler(req: Request, res: Response) {
+async function searchAppointmentsHandler(
+  req: Request,
+  res: Response<SearchResults<AppointmentDto>>,
+) {
   const { username } = req.user!
+
   try {
-    const appointments = await searchAppointments({ user: username })
-    res.json({ appointments })
+    // Parsing query parameters into the appropriate types
+    const dto: SearchAppointmentsDto = {
+      userId: req.query.userId as string,
+      providerId: req.query.providerId as string,
+      type: req.query.type as AppointmentType, // Assuming AppointmentType can be directly cast from a string
+      description: req.query.description as string,
+      startTime: req.query.startTime as string,
+      endTime: req.query.endTime as string,
+      canceled: req.query.canceled === 'true', // Parsing the string to a boolean
+      page: parseInt(req.query.page as string, 10),
+      rowsPerPage: parseInt(req.query.rowsPerPage as string, 10),
+      sortField: req.query.sortField as string,
+      sortDirection: req.query.sortDirection as SortDirection,
+    }
+
+    const results = await searchAppointments(dto, { user: username })
+    res.json(results)
   } catch (err) {
     const errMsg = `failed to search booked appointments for user: '${username}', because: ${err}`
     console.error(errMsg)
     return badRequest(res, 'Failed to search booked appointments')
-  }
-}
-
-/**
- * Handler function to get all appointments for a user.
- *
- * This includes all booked appointments for the particular user
- * and all unbooked appointments for all service providers.
- *
- * Requires an authenticated user for access.
- * For use by regular users only.
- *
- * @param req - Express Request object.
- * @param res - Express Response object.
- * @returns Returns a JSON response with all appointments for the user.
- */
-async function getAllAppointmentsHandler(req: Request, res: Response) {
-  const { username } = req.user!
-  try {
-    const appointments = await searchAppointments({
-      user: username,
-      includeAllUnbooked: true,
-    })
-    res.json({ appointments })
-  } catch (err) {
-    const errMsg = `failed to search all appointments for user: '${username}', because: ${err}`
-    console.error(errMsg)
-    return badRequest(res, 'Failed to search all appointments')
   }
 }
 
@@ -76,7 +69,6 @@ async function getAllAppointmentsHandler(req: Request, res: Response) {
 async function getAppointmentHandler(req: Request, res: Response) {
   const { username } = req.user!
   const { appointmentId } = req.params
-  console.log(appointmentId)
   try {
     const appointment = await getAppointment({
       id: appointmentId,
@@ -192,9 +184,8 @@ async function cancelAppointmentHandler(
 }
 
 const router = Router()
-router.get('/', ensureAuthenticated, getBookedAppointmentsHandler)
 router.post('/', ensureAuthenticated, createAppointmentHandler)
-router.get('/all', ensureAuthenticated, getAllAppointmentsHandler)
+router.get('/search', ensureAuthenticated, searchAppointmentsHandler)
 router.post('/book', ensureAuthenticated, bookAppointmentHandler)
 router.post('/cancel', ensureAuthenticated, cancelAppointmentHandler)
 router.get('/:appointmentId', ensureAuthenticated, getAppointmentHandler)

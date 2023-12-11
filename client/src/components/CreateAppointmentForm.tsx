@@ -13,16 +13,37 @@ export default function CreateAppointmentForm({
   const [startTime, setStartTime] = useState<string>('')
   const [endTime, setEndTime] = useState<string>('')
 
+  const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newStartTime = e.target.value
+    setStartTime(newStartTime)
+
+    // Create a Date object from the input value
+    const startDateTime = new Date(newStartTime)
+
+    // Set end time to 1 hour after the start time
+    startDateTime.setHours(startDateTime.getHours() + 1)
+
+    // Adjust for the timezone offset to keep the time in the local timezone
+    const timezoneOffset = startDateTime.getTimezoneOffset() * 60000 // offset in milliseconds
+    const localEndTime = new Date(startDateTime.getTime() - timezoneOffset)
+
+    // Format the date to the correct format for datetime-local input
+    const endDateTime = localEndTime.toISOString().slice(0, 16)
+
+    setEndTime(endDateTime)
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    // Validate the dates
     const start = new Date(startTime)
     const end = new Date(endTime)
     const currentDate = new Date()
-    if (start <= new Date() || end <= new Date() || start >= end || start < currentDate || end < currentDate || start.getDate() != end.getDate()) {
+
+    if (start < currentDate || end <= start) {
       alert('Please enter valid start and end times.')
       return
     }
+
     await onSubmit({
       type,
       description,
@@ -30,7 +51,7 @@ export default function CreateAppointmentForm({
       end_time: end,
     })
 
-    // TODO: make sure it worked before clearing the form
+    // Clear the form
     setType(AppointmentType.BEAUTY)
     setDescription('')
     setStartTime('')
@@ -38,7 +59,8 @@ export default function CreateAppointmentForm({
   }
 
   return (
-    <><form onSubmit={handleSubmit} className="space-y-4">
+    <>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label
             htmlFor="type"
@@ -70,7 +92,8 @@ export default function CreateAppointmentForm({
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-            placeholder="Provide a description for the appointment" />
+            placeholder="Provide a description for the appointment"
+          />
         </div>
         <div>
           <label
@@ -83,8 +106,9 @@ export default function CreateAppointmentForm({
             type="datetime-local"
             id="start_time"
             value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" />
+            onChange={handleStartTimeChange}
+            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          />
         </div>
         <div>
           <label
@@ -97,8 +121,10 @@ export default function CreateAppointmentForm({
             type="datetime-local"
             id="end_time"
             value={endTime}
+            min={startTime}
             onChange={(e) => setEndTime(e.target.value)}
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" />
+            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          />
         </div>
         <div>
           <button
@@ -108,6 +134,7 @@ export default function CreateAppointmentForm({
             Create Appointment
           </button>
         </div>
-      </form></>
+      </form>
+    </>
   )
 }

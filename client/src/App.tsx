@@ -8,11 +8,14 @@ import Register from './pages/Register'
 import Schedule from './pages/Schedule'
 import UserProvider from './providers/UserProvider'
 import Appointment from './pages/Appointment'
+import EventProvider from './providers/EventProvider'
 
 export default function App() {
   return (
     <UserProvider>
-      <AppRoutes />
+      <EventProvider>
+        <AppRoutes />
+      </EventProvider>
     </UserProvider>
   )
 }

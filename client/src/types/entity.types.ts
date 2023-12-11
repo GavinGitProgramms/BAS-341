@@ -12,6 +12,13 @@ export enum AppointmentType {
   MEDICAL = 'MEDICAL',
 }
 
+export enum EventType {
+  APPOINTMENT_CREATED = 'APPOINTMENT_CREATED',
+  APPOINTMENT_CANCELED = 'APPOINTMENT_CANCELED',
+  APPOINTMENT_UPDATED = 'APPOINTMENT_UPDATED',
+  APPOINTMENT_BOOKED = 'APPOINTMENT_BOOKED',
+}
+
 /* ~~~ Entities ~~~~ */
 
 export type BaseEntity<T> = {
