@@ -65,7 +65,6 @@ export function useAppointmentsSearch(
       )
 
       if (response.status === 200) {
-        // Assuming the API now returns an object with 'results' and 'total'
         setAppointments(response.data)
       }
     } catch (err) {

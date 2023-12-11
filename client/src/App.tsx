@@ -6,9 +6,11 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Schedule from './pages/Schedule'
+import Users from './pages/Users'
 import UserProvider from './providers/UserProvider'
 import Appointment from './pages/Appointment'
 import EventProvider from './providers/EventProvider'
+import { UserType } from './types'
 
 export default function App() {
   return (
@@ -44,6 +46,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Schedule />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute userType={UserType.ADMIN}>
+            <Users />
           </ProtectedRoute>
         }
       />

@@ -1,3 +1,4 @@
+import { Raw } from 'typeorm'
 import { AppDataSource } from '../data-source'
 import { User, UserType } from '../entity'
 import { hashPassword } from './user.utils'
@@ -53,6 +54,12 @@ async function ensureDefaultAdmin(): Promise<void> {
 
     await userRepository.save(adminUser)
   }
+}
+
+export function likeStr(value: string) {
+  return Raw((alias) => `LOWER(${alias}) LIKE LOWER(:value)`, {
+    value: `%${value}%`,
+  })
 }
 
 //   const admin = new User()

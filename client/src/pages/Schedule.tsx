@@ -1,16 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppointmentsTable from '../components/AppointmentsTable'
 import CreateAppointmentForm from '../components/CreateAppointmentForm'
 import { useAppointments, useUser } from '../hooks'
-import AppointmentImg from '../images/Appointment.png' // Placeholder image for qualifications card
-import ScheduleImg from '../images/Schedule.png' // Placeholder image for qualifications card
+import AppointmentImg from '../images/Appointment.png'
+import ScheduleImg from '../images/Schedule.png'
 import Layout from '../layout/Layout'
-import { UserType } from '../types' // Import UserType enum
+import { UserType } from '../types'
 
 export default function Schedule() {
   const { user } = useUser()
-  const [query, setQuery] = useState('')
   const navigate = useNavigate()
   const { createAppointment } = useAppointments()
 

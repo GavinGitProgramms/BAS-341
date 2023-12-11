@@ -70,6 +70,15 @@ export type SearchAppointmentsDto = {
   canceled?: boolean
 } & EntitySearchOptions
 
+export type SearchUsersDto = {
+  username?: string
+  type?: UserType
+  firstName?: string
+  lastName?: string
+  phoneNumber?: string
+  email?: string
+} & EntitySearchOptions
+
 export type UserDto = Omit<User, 'password_hash'>
 
 export type AppointmentDto = Omit<Appointment, 'user' | 'provider'> & {

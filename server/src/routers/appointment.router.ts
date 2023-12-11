@@ -36,7 +36,7 @@ async function searchAppointmentsHandler(
     const dto: SearchAppointmentsDto = {
       userId: req.query.userId as string,
       providerId: req.query.providerId as string,
-      type: req.query.type as AppointmentType, // Assuming AppointmentType can be directly cast from a string
+      type: req.query.type as AppointmentType,
       description: req.query.description as string,
       startTime: req.query.startTime as string,
       endTime: req.query.endTime as string,
@@ -50,9 +50,9 @@ async function searchAppointmentsHandler(
     const results = await searchAppointments(dto, { user: username })
     res.json(results)
   } catch (err) {
-    const errMsg = `failed to search booked appointments for user: '${username}', because: ${err}`
+    const errMsg = `failed to search appointments for user: '${username}', because: ${err}`
     console.error(errMsg)
-    return badRequest(res, 'Failed to search booked appointments')
+    return badRequest(res, 'Failed to search appointments')
   }
 }
 

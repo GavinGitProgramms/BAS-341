@@ -1,13 +1,16 @@
 import {
   CreateUserArgs,
+  SearchUsersDto,
+  SortDirection,
   UserType,
   checkCredentials,
   createUser,
   expandUser,
+  searchUsers,
   userDto,
 } from 'bas-db'
 import { Request, Response, Router } from 'express'
-import { ensureAuthenticated } from '../middleware'
+import { ensureAdmin, ensureAuthenticated } from '../middleware'
 import { badRequest, internalErrorRequest, unauthorizedRequest } from '../utils'
 
 /**
@@ -96,10 +99,38 @@ async function userHandler(req: Request, res: Response) {
   return res.json(userDto(user))
 }
 
+async function searchUsersHandler(req: Request, res: Response) {
+  const { username } = req.user!
+
+  try {
+    // Parsing query parameters into the appropriate types
+    const dto: SearchUsersDto = {
+      username: req.query.username as string,
+      type: req.query.type as UserType,
+      firstName: req.query.firstName as string,
+      lastName: req.query.lastName as string,
+      phoneNumber: req.query.phoneNumber as string,
+      email: req.query.email as string,
+      page: parseInt(req.query.page as string, 10),
+      rowsPerPage: parseInt(req.query.rowsPerPage as string, 10),
+      sortField: req.query.sortField as string,
+      sortDirection: req.query.sortDirection as SortDirection,
+    }
+
+    const results = await searchUsers(dto, { user: username })
+    res.json(results)
+  } catch (err) {
+    const errMsg = `failed to search users for user: '${username}', because: ${err}`
+    console.error(errMsg)
+    return badRequest(res, 'Failed to search users')
+  }
+}
+
 const router = Router()
 router.post('/register', registerHandler)
 router.post('/login', loginHandler)
 router.get('/logout', ensureAuthenticated, logoutHandler)
 router.get('/user', ensureAuthenticated, userHandler)
+router.get('/user/search', ensureAdmin, searchUsersHandler)
 
 export default router

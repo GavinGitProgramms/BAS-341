@@ -4,7 +4,6 @@ import {
   FindOptionsWhere,
   IsNull,
   LessThanOrEqual,
-  Like,
   MoreThanOrEqual,
 } from 'typeorm'
 import { AppDataSource } from '../data-source'
@@ -19,7 +18,7 @@ import type {
   SearchContext,
   SearchResults,
 } from '../types'
-import { ensureInitialized } from './db.utils'
+import { ensureInitialized, likeStr } from './db.utils'
 import { expandUser, userDto } from './user.utils'
 
 /**
@@ -84,7 +83,7 @@ export async function getAppointment({
  *
  * @param {SearchAppointmentsDto} dto - The DTO containing search parameters.
  * @param {SearchContext} context - The context of the user performing the search.
- * @returns {Promise<SearchResults>} - A promise that resolves to the search results.
+ * @returns {Promise<SearchResults<AppointmentDto>>} - A promise that resolves to the search results.
  */
 export async function searchAppointments(
   dto: SearchAppointmentsDto,
@@ -131,14 +130,14 @@ export async function searchAppointments(
   // Adding additional filters from DTO
   if (dto.userId) {
     if (requestingUser.type !== UserType.REGULAR) {
-      filterWhereOptions['user'] = { username: Like(`%${dto.userId}%`) }
+      filterWhereOptions['user'] = { username: likeStr(dto.userId) }
     }
   }
 
   if (dto.providerId) {
     if (requestingUser.type !== UserType.SERVICE_PROVIDER) {
       filterWhereOptions['provider'] = {
-        username: Like(`%${dto.providerId}%`),
+        username: likeStr(dto.providerId),
       }
     }
   }
@@ -148,7 +147,7 @@ export async function searchAppointments(
   }
 
   if (dto.description) {
-    filterWhereOptions['description'] = Like(`%${dto.description}%`)
+    filterWhereOptions['description'] = likeStr(dto.description)
   }
 
   if (dto.startTime) {

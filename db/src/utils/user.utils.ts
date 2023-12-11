@@ -5,9 +5,13 @@ import type {
   CreateQualificationArgs,
   CreateUserArgs,
   GetUserArgs,
+  SearchContext,
+  SearchResults,
+  SearchUsersDto,
   UserDto,
 } from '../types'
-import { ensureInitialized } from './db.utils'
+import { ensureInitialized, likeStr } from './db.utils'
+import { FindOptionsOrder, FindOptionsWhere, Not } from 'typeorm'
 
 /**
  * Hashes a password using the SHA256 algorithm.
@@ -61,6 +65,82 @@ export async function expandUser(user: User | string): Promise<User> {
     return userEntity
   } else {
     return user
+  }
+}
+
+/**
+ * Searches for users based on the provided DTO and user context.
+ *
+ * @param {SearchUsersDto} dto - The DTO containing search parameters.
+ * @param {SearchContext} context - The context of the user performing the search.
+ * @returns {Promise<SearchResults<UserDto>>} - A promise that resolves to the search results.
+ */
+export async function searchUsers(
+  dto: SearchUsersDto,
+  context: SearchContext,
+): Promise<SearchResults<UserDto>> {
+  await ensureInitialized()
+  const appointmentRepo = AppDataSource.getRepository(User)
+
+  const whereOptions: FindOptionsWhere<User> = {}
+
+  const requestingUser = await expandUser(context.user)
+
+  if (requestingUser.type !== UserType.ADMIN) {
+    throw new Error('Only admin users can search for users')
+  }
+
+  // Adding additional filters from DTO
+  if (dto.username) {
+    whereOptions['username'] = likeStr(dto.username)
+  }
+
+  if (dto.type && dto.type !== UserType.ADMIN) {
+    whereOptions['type'] = dto.type
+  } else {
+    whereOptions['type'] = Not(UserType.ADMIN)
+  }
+
+  if (dto.firstName) {
+    whereOptions['first_name'] = likeStr(dto.firstName)
+  }
+
+  if (dto.lastName) {
+    whereOptions['last_name'] = likeStr(dto.lastName)
+  }
+
+  if (dto.phoneNumber) {
+    whereOptions['phone_number'] = likeStr(dto.phoneNumber)
+  }
+
+  if (dto.email) {
+    whereOptions['email'] = likeStr(dto.email)
+  }
+
+  // Pagination and sorting
+  const skip = (dto.page - 1) * dto.rowsPerPage
+  const take = dto.rowsPerPage
+
+  const order: FindOptionsOrder<User> = {
+    [dto.sortField]: dto.sortDirection,
+  }
+
+  const users = await appointmentRepo.find({
+    where: whereOptions,
+    order,
+    skip,
+    take,
+  })
+
+  // Count total appointments
+  const total = await appointmentRepo.count({
+    where: whereOptions,
+  })
+
+  // Map to DTOs and return results with total
+  return {
+    total: total,
+    results: users.map(userDto),
   }
 }
 
