@@ -51,6 +51,9 @@ export class User {
   })
   type: UserType
 
+  @Column({ default: true })
+  enabled: boolean
+
   @Column()
   first_name: string
 
