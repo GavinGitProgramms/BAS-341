@@ -94,7 +94,6 @@ export async function searchAppointments(
 
   // Constructing where conditions based on DTO
   const mainWhereOptions: FindOptionsWhere<Appointment> = {}
-  const altWhereOptions: FindOptionsWhere<Appointment> = {}
   const filterWhereOptions: FindOptionsWhere<Appointment> = {}
 
   const allWhereOptions: Array<FindOptionsWhere<Appointment>> = []
@@ -113,10 +112,6 @@ export async function searchAppointments(
     case UserType.REGULAR:
       // Regular users can only see their appointments (even cancled ones)
       mainWhereOptions['user'] = { id: requestingUser.id }
-
-      // Allow for all unbooked appointments to be returned
-      altWhereOptions['user'] = IsNull()
-      altWhereOptions['canceled'] = false
       break
     case UserType.SERVICE_PROVIDER:
       // Service providers can only see appointments they created
@@ -179,14 +174,15 @@ export async function searchAppointments(
           [dto.sortField]: dto.sortDirection,
         }
 
-  allWhereOptions.push({ ...mainWhereOptions, ...filterWhereOptions })
-  if (Object.keys(altWhereOptions).length > 0) {
-    allWhereOptions.push({ ...altWhereOptions, ...filterWhereOptions })
+  if (dto.unbookedOnly === true) {
+    // Regular users can only see their appointments (even cancled ones)
+    mainWhereOptions['user'] = IsNull()
     if (requestingUser.type === UserType.REGULAR) {
-      // Regular users can't search for unbooked appointments that have been canceled
-      allWhereOptions[1]['canceled'] = false
+      mainWhereOptions['canceled'] = false
     }
   }
+
+  allWhereOptions.push({ ...filterWhereOptions, ...mainWhereOptions })
 
   const appointments = await appointmentRepo.find({
     where: allWhereOptions,

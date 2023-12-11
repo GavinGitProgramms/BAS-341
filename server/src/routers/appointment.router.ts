@@ -45,6 +45,7 @@ async function searchAppointmentsHandler(
       rowsPerPage: parseInt(req.query.rowsPerPage as string, 10),
       sortField: req.query.sortField as string,
       sortDirection: req.query.sortDirection as SortDirection,
+      unbookedOnly: req.query.unbookedOnly === 'true',
     }
 
     const results = await searchAppointments(dto, { user: username })

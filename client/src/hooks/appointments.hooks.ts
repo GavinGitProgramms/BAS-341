@@ -42,6 +42,7 @@ export function useAppointmentsSearch(
     startTime: undefined,
     endTime: undefined,
     canceled: false,
+    unbookedOnly: false,
     ...(initialSearchParams || {}),
   })
 

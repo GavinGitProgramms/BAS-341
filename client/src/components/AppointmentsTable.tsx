@@ -10,14 +10,12 @@ import { toTitleCase } from '../utils'
 export type AppointmentsTableProps = {
   initialSearchParams?: Partial<SearchAppointmentsDto>
   onClick?: (appointmentId: string) => void
-  filterRows?: (row: AppointmentDto) => boolean
   hideCanceledFilter?: boolean
 }
 
 export default function AppointmentsTable({
   initialSearchParams,
   onClick,
-  filterRows,
   hideCanceledFilter = false,
 }: AppointmentsTableProps) {
   const { user } = useUser()
@@ -202,10 +200,6 @@ export default function AppointmentsTable({
     }
   }
 
-  const filteredAppointments = filterRows
-    ? appointments.results.filter(filterRows)
-    : appointments.results
-
   return (
     <>
       {renderSearchForm()}
@@ -229,7 +223,7 @@ export default function AppointmentsTable({
             </tr>
           </thead>
           <tbody>
-            {filteredAppointments.map((appointment) => (
+            {appointments.results.map((appointment) => (
               <tr
                 key={appointment.id}
                 className={onClick ? 'hover:bg-base-100 cursor-pointer' : ''}

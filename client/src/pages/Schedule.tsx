@@ -88,7 +88,7 @@ export default function Schedule() {
                     <AppointmentsTable
                       hideCanceledFilter
                       onClick={handleRowClick}
-                      filterRows={(appointment) => !appointment.user}
+                      initialSearchParams={{ unbookedOnly: true, canceled: false }}
                     />
                   )}
                 </div>

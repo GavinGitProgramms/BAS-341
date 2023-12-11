@@ -68,6 +68,7 @@ export type SearchAppointmentsDto = {
   startTime?: string
   endTime?: string
   canceled?: boolean
+  unbookedOnly?: boolean
 } & EntitySearchOptions
 
 export type SearchUsersDto = {
