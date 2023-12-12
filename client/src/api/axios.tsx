@@ -17,11 +17,14 @@ const methodSpecificHeaders: MethodSpecificHeaders = {
     Accept: 'application/json',
     'Content-Type': 'application/json',
   },
-  // Add other methods as necessary
+  put: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
 }
 
 // Define a type that includes only the HTTP methods you're going to support
-type RequestMethod = 'get' | 'post'
+type RequestMethod = 'get' | 'post' | 'put'
 
 const sendRequest = (
   method: RequestMethod,
@@ -44,6 +47,8 @@ const sendRequest = (
       return axiosApi.get(url, { ...finalConfig, params: data })
     case 'post':
       return axiosApi.post(url, data, finalConfig)
+    case 'put':
+      return axiosApi.put(url, data, finalConfig)
     default:
       throw new Error(`Method ${method} is not supported by api object.`)
   }
@@ -60,6 +65,11 @@ type ApiWithMethods = {
     data?: any,
     config?: AxiosRequestConfig,
   ) => Promise<AxiosResponse<any>>
+  put: (
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig,
+  ) => Promise<AxiosResponse<any>>
 }
 
 const api: ApiWithMethods = {
@@ -68,6 +78,9 @@ const api: ApiWithMethods = {
   },
   post(url, data, config = {}) {
     return sendRequest('post', url, data, config)
+  },
+  put(url, data, config = {}) {
+    return sendRequest('put', url, data, config)
   },
 }
 

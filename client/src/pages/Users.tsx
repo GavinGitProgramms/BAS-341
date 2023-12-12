@@ -1,11 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import UsersTable from '../components/UsersTable'
-import { useUser } from '../hooks'
 import UsersImg from '../images/UserManage.png'
 import Layout from '../layout/Layout'
 
 export default function Users() {
-  const { user } = useUser()
   const navigate = useNavigate()
 
   function handleRowClick(userId: string) {

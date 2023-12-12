@@ -17,6 +17,8 @@ export enum EventType {
   APPOINTMENT_CANCELED = 'APPOINTMENT_CANCELED',
   APPOINTMENT_UPDATED = 'APPOINTMENT_UPDATED',
   APPOINTMENT_BOOKED = 'APPOINTMENT_BOOKED',
+  USER_ENABLED = 'USER_ENABLED',
+  USER_DISABLED = 'USER_DISABLED',
 }
 
 /* ~~~ Entities ~~~~ */
@@ -40,6 +42,7 @@ export type User = BaseEntity<{
   email: string
   phone_number: string
   qualifications: Qualification[]
+  enabled: boolean
 }>
 
 export type Appointment = BaseEntity<{

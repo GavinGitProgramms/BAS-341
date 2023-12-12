@@ -7,6 +7,8 @@ import {
   createUser,
   expandUser,
   searchUsers,
+  disableUser,
+  enableUser,
   userDto,
 } from 'bas-db'
 import { Request, Response, Router } from 'express'
@@ -89,7 +91,7 @@ async function logoutHandler(req: Request, res: Response) {
  * @param res - The response object.
  * @returns A JSON response containing the user data.
  */
-async function userHandler(req: Request, res: Response) {
+async function getAuthUserHandler(req: Request, res: Response) {
   const { username } = req.user!
   const user = await expandUser(username)
   if (!user) {
@@ -99,6 +101,13 @@ async function userHandler(req: Request, res: Response) {
   return res.json(userDto(user))
 }
 
+/**
+ * Handles the search users request.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns The search results as a JSON response.
+ */
 async function searchUsersHandler(req: Request, res: Response) {
   const { username } = req.user!
 
@@ -127,11 +136,74 @@ async function searchUsersHandler(req: Request, res: Response) {
   }
 }
 
+/**
+ * Handles the request to enable a user.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns A JSON response with the results of enabling the user.
+ */
+async function enableUserHandler(req: Request, res: Response) {
+  const { username } = req.params
+  try {
+    const results = await enableUser(username)
+    res.json(results)
+  } catch (err) {
+    const errMsg = `failed to enable user: '${username}', because: ${err}`
+    console.error(errMsg)
+    return badRequest(res, 'Failed to enable user')
+  }
+}
+
+/**
+ * Handles the request to disable a user.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns A JSON response with the results of disabling the user.
+ */
+async function disableUserHandler(req: Request, res: Response) {
+  const { username } = req.params
+  try {
+    const results = await disableUser(username)
+    res.json(results)
+  } catch (err) {
+    const errMsg = `failed to disable user: '${username}', because: ${err}`
+    console.error(errMsg)
+    return badRequest(res, 'Failed to disable user')
+  }
+}
+
+/**
+ * Retrieves user data based on the provided username.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ * @returns A JSON response containing the user data.
+ */
+async function getUserHandler(req: Request, res: Response) {
+  const { username } = req.params
+  const user = await expandUser(username)
+  if (!user) {
+    return badRequest(res, 'No user data was found')
+  }
+
+  return res.json(userDto(user))
+}
+
 const router = Router()
+
+// Auth routes
 router.post('/register', registerHandler)
 router.post('/login', loginHandler)
 router.get('/logout', ensureAuthenticated, logoutHandler)
-router.get('/user', ensureAuthenticated, userHandler)
+router.get('/user', ensureAuthenticated, getAuthUserHandler)
+
+// Admin routes
 router.get('/user/search', ensureAdmin, searchUsersHandler)
+router.put('/user/enable/:username', ensureAdmin, enableUserHandler)
+router.put('/user/disable/:username', ensureAdmin, disableUserHandler)
+router.put('/user/disable/:username', ensureAdmin, disableUserHandler)
+router.get('/user/:username', ensureAdmin, getUserHandler)
 
 export default router

@@ -26,9 +26,6 @@ export default function Appointment() {
     }
 
     await bookAppointment({ id: appointment.id })
-
-    // Return the user to the last page they were on
-    sessionStorage.setItem('scrollToTopOnBack', 'true')
     window.history.back()
   }
 
@@ -38,8 +35,6 @@ export default function Appointment() {
     }
 
     await cancelAppointment({ id: appointment.id })
-
-    // Return the user to the last page they were on
     window.history.back()
   }
 
@@ -71,7 +66,7 @@ export default function Appointment() {
                 <p>
                   <strong>Status:</strong>{' '}
                   {appointment.canceled
-                    ? 'Cancelled'
+                    ? 'Canceled'
                     : appointment.user
                     ? 'Booked'
                     : 'Available'}

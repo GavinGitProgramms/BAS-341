@@ -12,6 +12,7 @@ import type {
 } from '../types'
 import { ensureInitialized, likeStr } from './db.utils'
 import { FindOptionsOrder, FindOptionsWhere, Not } from 'typeorm'
+import { cancelAllAppointments } from './appointment.utils'
 
 /**
  * Hashes a password using the SHA256 algorithm.
@@ -87,7 +88,7 @@ export async function searchUsers(
   const requestingUser = await expandUser(context.user)
 
   if (requestingUser.type !== UserType.ADMIN) {
-    throw new Error('Only admin users can search for users')
+    throw new Error('only admin users can search for users')
   }
 
   // Adding additional filters from DTO
@@ -149,7 +150,53 @@ export async function searchUsers(
 }
 
 /**
+ * Disables a user by setting their 'enabled' property to false.
+ *
+ * Also cancels all appointments for the user after a delay of 1 second.
+ *
+ * @param username - The username of the user to disable.
+ * @returns A promise that resolves to the disabled user as a UserDto.
+ * @throws An error if the user cannot be found.
+ */
+export async function disableUser(username: string): Promise<UserDto> {
+  await ensureInitialized()
+  const userRepo = AppDataSource.getRepository(User)
+  const user = await userRepo.findOne({ where: { username } })
+  if (!user) {
+    throw new Error(`could not find user: '${username}'`)
+  }
+
+  user.enabled = false
+  await userRepo.save(user)
+
+  setTimeout(() => cancelAllAppointments(user.username), 1000)
+  return userDto(user)
+}
+
+/**
+ * Enables a user by setting the 'enabled' property to true.
+ *
+ * @param username - The username of the user to enable.
+ * @returns A Promise that resolves to a UserDto representing the enabled user.
+ * @throws An Error if the user with the specified username is not found.
+ */
+export async function enableUser(username: string): Promise<UserDto> {
+  await ensureInitialized()
+  const userRepo = AppDataSource.getRepository(User)
+  const user = await userRepo.findOne({ where: { username } })
+  if (!user) {
+    throw new Error(`could not find user: '${username}'`)
+  }
+
+  user.enabled = true
+  await userRepo.save(user)
+  return userDto(user)
+}
+
+/**
  * Checks if the provided credentials are valid for a user.
+ *
+ * Also returns false is a user is disabled.
  *
  * @param username - The username of the user.
  * @param password - The password of the user.
@@ -161,6 +208,10 @@ export async function checkCredentials(
 ): Promise<UserDto | false> {
   const user = await getUser({ username })
   if (!user) {
+    return false
+  }
+
+  if (!user.enabled) {
     return false
   }
 

@@ -407,6 +407,34 @@ export async function cancelAppointment({
 }
 
 /**
+ * Cancels all appointments for a given username.
+ *
+ * @param username - The username for which to cancel appointments.
+ * @returns A promise that resolves when all appointments are canceled.
+ */
+export async function cancelAllAppointments(username: string) {
+  await ensureInitialized()
+  const appointmentRepo = AppDataSource.getRepository(Appointment)
+
+  const appointments = await appointmentRepo.find({
+    where: { user: { username } },
+  })
+
+  for (const appointment of appointments) {
+    try {
+      const currentTime = new Date()
+      if (!appointment.canceled && appointment.end_time > currentTime) {
+        await cancelAppointment({ id: appointment.id, user: username })
+      }
+    } catch (err) {
+      console.error(
+        `failed to cancel appointment: ${appointment.id}, because: ${err}`,
+      )
+    }
+  }
+}
+
+/**
  * Converts an Appointment object to an AppointmentDto object.
  *
  * @param {Appointment} appointment - The Appointment object to convert.

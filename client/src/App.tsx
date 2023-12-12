@@ -2,14 +2,15 @@ import { Route, Routes } from 'react-router'
 import './App.css'
 import ProtectedRoute from './components/ProtectedRoute'
 import { useUser } from './hooks'
+import Appointment from './pages/Appointment'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Schedule from './pages/Schedule'
+import User from './pages/User'
 import Users from './pages/Users'
-import UserProvider from './providers/UserProvider'
-import Appointment from './pages/Appointment'
 import EventProvider from './providers/EventProvider'
+import UserProvider from './providers/UserProvider'
 import { UserType } from './types'
 
 export default function App() {
@@ -54,6 +55,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute userType={UserType.ADMIN}>
             <Users />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user/:username"
+        element={
+          <ProtectedRoute userType={UserType.ADMIN}>
+            <User />
           </ProtectedRoute>
         }
       />

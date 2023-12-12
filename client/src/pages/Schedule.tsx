@@ -27,16 +27,6 @@ export default function Schedule() {
     navigate(`/appointment/${appointmentId}`)
   }
 
-  useEffect(() => {
-    if (sessionStorage.getItem('scrollToTopOnBack') === 'true') {
-      // Scroll to the top
-      window.scrollTo(0, 0)
-
-      // Clear the flag
-      sessionStorage.removeItem('scrollToTopOnBack')
-    }
-  }, [])
-
   return (
     <Layout>
       <div className="container p-6 mx-auto">
@@ -88,7 +78,10 @@ export default function Schedule() {
                     <AppointmentsTable
                       hideCanceledFilter
                       onClick={handleRowClick}
-                      initialSearchParams={{ unbookedOnly: true, canceled: false }}
+                      initialSearchParams={{
+                        unbookedOnly: true,
+                        canceled: false,
+                      }}
                     />
                   )}
                 </div>
