@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useUser, useAppointments } from '../hooks'
 import Layout from '../layout/Layout'
 import { Appointment as AppointmentType, UserType } from '../types'
 import { toTitleCase } from '../utils'
+import BackButton from '../components/GoBack'
 
 export default function Appointment() {
+  const navigate = useNavigate()
   const { user } = useUser()
   const { appointmentId } = useParams()
 
@@ -26,7 +28,7 @@ export default function Appointment() {
     }
 
     await bookAppointment({ id: appointment.id })
-    window.history.back()
+    navigate(-1)
   }
 
   async function handleCancelAppointment() {
@@ -35,7 +37,7 @@ export default function Appointment() {
     }
 
     await cancelAppointment({ id: appointment.id })
-    window.history.back()
+    navigate(-1)
   }
 
   const isProviderView =
@@ -47,7 +49,12 @@ export default function Appointment() {
         {appointment ? (
           <div className="card bg-base-200 shadow-xl">
             <div className="card-body">
-              <h2 className="card-title mb-6">Appointment Details</h2>
+              <div>
+                <BackButton />
+              </div>
+              <div className="w-full border-t border-white my-4"></div>
+              <h2 className="card-title">Appointment Details</h2>
+              <div className="w-full border-t border-white my-4"></div>
               <div className="space-y-4 mb-6">
                 <p>
                   <strong>Type:</strong> {toTitleCase(appointment.type)}

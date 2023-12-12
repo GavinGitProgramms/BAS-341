@@ -1,6 +1,7 @@
 import { useUser } from '../hooks'
 import { Link, useLocation } from 'react-router-dom'
 import BASIcon from '../images/BAS.svg'
+import { UserType } from '../types'
 
 export type LayoutProps = {
   children: React.ReactNode
@@ -8,7 +9,7 @@ export type LayoutProps = {
 
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation()
-  const { isAuthenticated, logout } = useUser()
+  const { isAuthenticated, user, logout } = useUser()
 
   const handleLogout = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
@@ -66,6 +67,13 @@ export default function Layout({ children }: LayoutProps) {
                     Schedule
                   </Link>
                 </li>
+                {user && user.type === UserType.ADMIN && (
+                  <li>
+                    <Link to="/users" className="rounded-btn">
+                      Users
+                    </Link>
+                  </li>
+                )}
                 <li>
                   <button onClick={handleLogout} className="rounded-btn">
                     Log Out
@@ -92,6 +100,13 @@ export default function Layout({ children }: LayoutProps) {
                 Schedule
               </Link>
             </li>
+            {user && user.type === UserType.ADMIN && (
+              <li>
+                <Link to="/users" className="rounded-btn">
+                  Users
+                </Link>
+              </li>
+            )}
             <li>
               <button onClick={handleLogout} className="rounded-btn">
                 Log Out

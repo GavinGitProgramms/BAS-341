@@ -12,7 +12,7 @@ export type UserContextType = {
   loading: boolean
   isAuthenticated: boolean
   user: User | null
-  errMsg: ''
+  errMsg: string
   login: (args: LoginArgs) => Promise<void>
   logout: () => Promise<void>
   register: (args: CreateUserArgs) => Promise<void>
@@ -43,6 +43,7 @@ export default function UserProvider({ children }: UserProviderProps) {
   const [loading, setLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState<User | null>(null)
+  const [errMsg, setErrMsg] = useState('')
 
   /**
    * Fetches user data from the API and updates the state accordingly.
@@ -52,6 +53,7 @@ export default function UserProvider({ children }: UserProviderProps) {
       const response = await api.get(USER_URL)
       setIsAuthenticated(true)
       setUser(response.data)
+      setErrMsg('')
     } catch (err) {
       console.error(err)
       setIsAuthenticated(false)
@@ -77,11 +79,13 @@ export default function UserProvider({ children }: UserProviderProps) {
       if (response.status === 200) {
         await fetchUser()
       } else {
+        setErrMsg('Invalid username or password')
         setUser(null)
         setIsAuthenticated(false)
       }
     } catch (err) {
       console.error(err)
+      setErrMsg('Invalid username or password')
       setUser(null)
       setIsAuthenticated(false)
     }
@@ -126,7 +130,7 @@ export default function UserProvider({ children }: UserProviderProps) {
     loading,
     isAuthenticated,
     user,
-    errMsg: '',
+    errMsg,
     login,
     logout,
     register,

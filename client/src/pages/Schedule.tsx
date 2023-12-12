@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppointmentsTable from '../components/AppointmentsTable'
 import CreateAppointmentForm from '../components/CreateAppointmentForm'
@@ -7,6 +6,7 @@ import AppointmentImg from '../images/Appointment.png'
 import ScheduleImg from '../images/Schedule.png'
 import Layout from '../layout/Layout'
 import { UserType } from '../types'
+import { getLocalDateStr } from '../utils'
 
 export default function Schedule() {
   const { user } = useUser()
@@ -45,9 +45,9 @@ export default function Schedule() {
                 {/* For regular users, show a table of appointments that they have booked */}
                 <AppointmentsTable
                   onClick={handleRowClick}
-                  filterRows={
-                    user && user.type === UserType.REGULAR
-                      ? (appointment) => Boolean(appointment.user)
+                  initialSearchParams={
+                    user && (user.type === UserType.REGULAR || user.type === UserType.SERVICE_PROVIDER)
+                      ? { startTime: getLocalDateStr(new Date()) }
                       : undefined
                   }
                 />
@@ -81,6 +81,7 @@ export default function Schedule() {
                       initialSearchParams={{
                         unbookedOnly: true,
                         canceled: false,
+                        startTime: getLocalDateStr(new Date()),
                       }}
                     />
                   )}

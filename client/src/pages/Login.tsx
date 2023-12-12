@@ -69,7 +69,7 @@ export default function Login() {
           {errMsg && (
             <p
               ref={errRef}
-              className="alert alert-error shadow-lg mt-4"
+              className="text-red-500 text-sm text-center mt-4"
               aria-live="assertive"
             >
               {errMsg}

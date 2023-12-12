@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import BackButton from '../components/GoBack'
 import { useUserAdmin } from '../hooks'
 import Layout from '../layout/Layout'
 import { UserDto, UserType } from '../types'
 import { toTitleCase } from '../utils'
 
 export default function User() {
+  const navigate = useNavigate()
   const { username } = useParams()
   const [user, setUser] = useState<UserDto | null>(null)
   const { getUser, enableUser, disableUser } = useUserAdmin()
@@ -27,7 +29,7 @@ export default function User() {
     }
 
     await enableUser(username)
-    window.history.back()
+    navigate(-1)
   }
 
   async function handleDisableUser() {
@@ -36,7 +38,7 @@ export default function User() {
     }
 
     await disableUser(username)
-    window.history.back()
+    navigate(-1)
   }
 
   return (
@@ -45,7 +47,12 @@ export default function User() {
         {user ? (
           <div className="card bg-base-200 shadow-xl">
             <div className="card-body">
-              <h2 className="card-title mb-6">User Details</h2>
+              <div>
+                <BackButton />
+              </div>
+              <div className="w-full border-t border-white my-4"></div>
+              <h2 className="card-title">User Details</h2>
+              <div className="w-full border-t border-white my-4"></div>
               <div className="space-y-4 mb-6">
                 <p>
                   <strong>Username:</strong> {user.username}
