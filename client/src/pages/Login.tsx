@@ -6,13 +6,14 @@ import Layout from '../layout/Layout'
 export default function Login() {
   const userRef = useRef<HTMLInputElement>(null)
   const errRef = useRef<HTMLParagraphElement>(null)
-  const { isAuthenticated, login, errMsg } = useUser()
+  const { isAuthenticated, login, errMsg, setErrMsg } = useUser()
 
   const [user, setUser] = useState('')
   const [pwd, setPwd] = useState('')
 
   useEffect(() => {
     userRef.current?.focus()
+    setErrMsg('')
   }, [])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

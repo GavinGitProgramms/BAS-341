@@ -1,10 +1,5 @@
 import { useAppointmentsSearch, useUser } from '../hooks'
-import {
-  AppointmentDto,
-  AppointmentType,
-  SearchAppointmentsDto,
-  UserType,
-} from '../types'
+import { AppointmentType, SearchAppointmentsDto, UserType } from '../types'
 import { toTitleCase } from '../utils'
 
 export type AppointmentsTableProps = {
@@ -23,6 +18,7 @@ export default function AppointmentsTable({
     useAppointmentsSearch(initialSearchParams)
 
   const isProviderView = user?.type === UserType.SERVICE_PROVIDER
+  const isAdminView = user?.type === UserType.ADMIN
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -59,7 +55,7 @@ export default function AppointmentsTable({
         {user?.type === UserType.ADMIN && (
           <div className="form-control w-full">
             <label className="label" htmlFor="userId">
-              <span className="label-text">User</span>
+              <span className="label-text">Username</span>
             </label>
             <input
               type="text"
@@ -74,7 +70,7 @@ export default function AppointmentsTable({
         {(user?.type === UserType.ADMIN || user?.type === UserType.REGULAR) && (
           <div className="form-control w-full">
             <label className="label" htmlFor="providerId">
-              <span className="label-text">Provider</span>
+              <span className="label-text">Provider Username</span>
             </label>
             <input
               type="text"
@@ -120,7 +116,7 @@ export default function AppointmentsTable({
         </div>
         <div className="form-control w-full">
           <label className="label" htmlFor="startTime">
-            <span className="label-text">Start Time</span>
+            <span className="label-text">Start Time After</span>
           </label>
           <input
             type="datetime-local"
@@ -133,7 +129,7 @@ export default function AppointmentsTable({
         </div>
         <div className="form-control w-full">
           <label className="label" htmlFor="endTime">
-            <span className="label-text">End Time</span>
+            <span className="label-text">End Time Before</span>
           </label>
           <input
             type="datetime-local"
@@ -148,7 +144,7 @@ export default function AppointmentsTable({
         {!hideCanceledFilter && (
           <div className="form-control w-full">
             <label className="label" htmlFor="canceled">
-              <span className="label-text">Canceled</span>
+              <span className="label-text">Is Canceled</span>
             </label>
             <select
               id="canceled"
@@ -161,6 +157,7 @@ export default function AppointmentsTable({
               onChange={handleInputChange}
               className="select select-bordered w-full"
             >
+              {isAdminView && <option value="">Select a Value</option>}
               <option value="true">Yes</option>
               <option value="false">No</option>
             </select>
@@ -220,6 +217,9 @@ export default function AppointmentsTable({
               {isProviderView && (
                 <th className="px-6 py-3 select-none">Booked</th>
               )}
+              {isAdminView && (
+                <th className="px-6 py-3 select-none">Canceled</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -256,6 +256,11 @@ export default function AppointmentsTable({
                     {appointment.user ? 'Yes' : 'No'}
                   </td>
                 )}
+                {isAdminView && (
+                  <td className="px-6 py-4">
+                    {appointment.canceled ? 'Yes' : 'No'}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -264,7 +269,7 @@ export default function AppointmentsTable({
       <div className="flex justify-between items-center mt-4">
         <button
           onClick={() => handlePageChange(searchParams.page - 1)}
-          disabled={searchParams.page === 1}
+          disabled={appointments.total === 0 || searchParams.page === 1}
           className="px-4 py-2 text-sm btn btn-primary"
         >
           Previous
@@ -276,8 +281,9 @@ export default function AppointmentsTable({
         <button
           onClick={() => handlePageChange(searchParams.page + 1)}
           disabled={
+            appointments.total === 0 ||
             searchParams.page ===
-            Math.ceil(appointments.total / searchParams.rowsPerPage)
+              Math.ceil(appointments.total / searchParams.rowsPerPage)
           }
           className="px-4 py-2 text-sm btn btn-primary"
         >

@@ -46,9 +46,11 @@ export default function Schedule() {
                 <AppointmentsTable
                   onClick={handleRowClick}
                   initialSearchParams={
-                    user && (user.type === UserType.REGULAR || user.type === UserType.SERVICE_PROVIDER)
+                    user &&
+                    (user.type === UserType.REGULAR ||
+                      user.type === UserType.SERVICE_PROVIDER)
                       ? { startTime: getLocalDateStr(new Date()) }
-                      : undefined
+                      : { canceled: undefined }
                   }
                 />
               </div>

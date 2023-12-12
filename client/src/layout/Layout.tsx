@@ -1,6 +1,8 @@
-import { useUser } from '../hooks'
+import { Toaster } from 'react-hot-toast'
 import { Link, useLocation } from 'react-router-dom'
+import { useUser } from '../hooks'
 import BASIcon from '../images/BAS.svg'
+
 import { UserType } from '../types'
 
 export type LayoutProps = {
@@ -64,7 +66,9 @@ export default function Layout({ children }: LayoutProps) {
               <ul className="menu menu-horizontal">
                 <li>
                   <Link to="/schedule" className="rounded-btn">
-                    Schedule
+                    {user && user.type === UserType.ADMIN
+                      ? 'Appointments'
+                      : 'Schedule'}
                   </Link>
                 </li>
                 {user && user.type === UserType.ADMIN && (
@@ -97,7 +101,9 @@ export default function Layout({ children }: LayoutProps) {
           <ul className="menu p-4 overflow-y-auto w-80 bg-base-200">
             <li>
               <Link to="/schedule" className="rounded-btn">
-                Schedule
+                {user && user.type === UserType.ADMIN
+                  ? 'Appointments'
+                  : 'Schedule'}
               </Link>
             </li>
             {user && user.type === UserType.ADMIN && (
@@ -115,6 +121,7 @@ export default function Layout({ children }: LayoutProps) {
           </ul>
         </div>
       )}
+      <Toaster />
     </div>
   )
 }

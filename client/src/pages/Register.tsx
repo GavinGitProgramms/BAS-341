@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { useUser } from '../hooks'
 import Layout from '../layout/Layout'
 import { CreateUserArgs, UserType } from '../types'
@@ -265,6 +265,11 @@ export default function Register() {
               {errMsg}
             </p>
           )}
+          <div className="flex flex-col items-center mt-6">
+            <Link to="/login" className="link link-hover">
+              Already have an account? Sign In
+            </Link>
+          </div>
         </div>
       </div>
     </Layout>

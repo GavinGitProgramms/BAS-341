@@ -1,5 +1,5 @@
-import api from '../api'
 import { useContext, useEffect, useState } from 'react'
+import api from '../api'
 import { UserContext, UserContextType } from '../providers/UserProvider'
 import {
   EventType,
@@ -8,6 +8,7 @@ import {
   UserDto,
   UserType,
 } from '../types'
+import { errorNotification, successNotification } from '../utils'
 import { useEvents } from './event.hooks'
 
 const SEARCH_USERS_URL = '/auth/user/search'
@@ -31,6 +32,7 @@ export function useUser(): UserContextType {
  * Requires the user to be authenticated and have an admin user type.
  */
 export function useUserAdmin() {
+  const { publish } = useEvents()
   const { isAuthenticated, user } = useUser()
   if (!user || user.type !== UserType.ADMIN) {
     throw new Error('invalid user type')
@@ -70,7 +72,11 @@ export function useUserAdmin() {
 
     const response = await api.put(`${ENABLE_USER_URL}/${username}`)
     if (response.status === 200) {
+      publish(EventType.USER_ENABLED)
+      successNotification('User enabled successfully')
       return response.data
+    } else {
+      errorNotification('Failed to enable user')
     }
 
     throw new Error('an unexpected error occurred')
@@ -90,7 +96,11 @@ export function useUserAdmin() {
 
     const response = await api.put(`${DISABLE_USER_URL}/${username}`)
     if (response.status === 200) {
+      publish(EventType.USER_DISABLED)
+      successNotification('User disabled successfully')
       return response.data
+    } else {
+      errorNotification('Failed to disable user')
     }
 
     throw new Error('an unexpected error occurred')

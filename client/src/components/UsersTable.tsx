@@ -37,7 +37,7 @@ export default function UsersTable({
         {user?.type === UserType.ADMIN && (
           <div className="form-control w-full">
             <label className="label" htmlFor="username">
-              <span className="label-text">User</span>
+              <span className="label-text">Username</span>
             </label>
             <input
               type="text"
@@ -123,7 +123,7 @@ export default function UsersTable({
         </div>
         <div className="form-control w-full">
           <label className="label" htmlFor="enabled">
-            <span className="label-text">Enabled</span>
+            <span className="label-text">Is Enabled</span>
           </label>
           <select
             id="enabled"
@@ -218,7 +218,7 @@ export default function UsersTable({
       <div className="flex justify-between items-center mt-4">
         <button
           onClick={() => handlePageChange(searchParams.page - 1)}
-          disabled={searchParams.page === 1}
+          disabled={users.total === 0 || searchParams.page === 1}
           className="px-4 py-2 text-sm btn btn-primary"
         >
           Previous
@@ -230,8 +230,9 @@ export default function UsersTable({
         <button
           onClick={() => handlePageChange(searchParams.page + 1)}
           disabled={
+            users.total === 0 ||
             searchParams.page ===
-            Math.ceil(users.total / searchParams.rowsPerPage)
+              Math.ceil(users.total / searchParams.rowsPerPage)
           }
           className="px-4 py-2 text-sm btn btn-primary"
         >

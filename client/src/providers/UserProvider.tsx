@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from 'react'
 import api from '../api'
 import { User } from '../types/entity.types'
 import { CreateUserArgs, LoginArgs } from '../types'
+import { errorNotification } from '../utils'
 
 const LOGIN_URL = '/auth/login'
 const LOGOUT_URL = '/auth/logout'
@@ -13,6 +14,7 @@ export type UserContextType = {
   isAuthenticated: boolean
   user: User | null
   errMsg: string
+  setErrMsg: (msg: string) => void
   login: (args: LoginArgs) => Promise<void>
   logout: () => Promise<void>
   register: (args: CreateUserArgs) => Promise<void>
@@ -28,6 +30,7 @@ function defaultUserContext(): UserContextType {
     isAuthenticated: false,
     user: null,
     errMsg: '',
+    setErrMsg: () => {},
     login: () => Promise.resolve(),
     logout: () => Promise.resolve(),
     register: () => Promise.resolve(),
@@ -80,12 +83,14 @@ export default function UserProvider({ children }: UserProviderProps) {
         await fetchUser()
       } else {
         setErrMsg('Invalid username or password')
+        errorNotification('Log in failed')
         setUser(null)
         setIsAuthenticated(false)
       }
     } catch (err) {
       console.error(err)
       setErrMsg('Invalid username or password')
+      errorNotification('Log in failed')
       setUser(null)
       setIsAuthenticated(false)
     }
@@ -116,10 +121,12 @@ export default function UserProvider({ children }: UserProviderProps) {
       if (response.status === 200) {
         await fetchUser()
       } else {
+        errorNotification('Registration failed')
         setUser(null)
         setIsAuthenticated(false)
       }
     } catch (err) {
+      errorNotification('Registration failed')
       console.error(err)
       setUser(null)
       setIsAuthenticated(false)
@@ -131,6 +138,7 @@ export default function UserProvider({ children }: UserProviderProps) {
     isAuthenticated,
     user,
     errMsg,
+    setErrMsg,
     login,
     logout,
     register,
