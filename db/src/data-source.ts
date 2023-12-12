@@ -4,9 +4,14 @@ import { Appointment, Event, Notification, Qualification, User } from './entity'
 import {
   Migration1700435027666,
   UsersEnabledMigration1702279479734,
+  NotificationViewedMigration1702355001707,
 } from './migration'
 
-const migrations = [Migration1700435027666, UsersEnabledMigration1702279479734]
+const migrations = [
+  Migration1700435027666,
+  UsersEnabledMigration1702279479734,
+  NotificationViewedMigration1702355001707,
+]
 
 export const AppDataSource = new DataSource({
   type: 'postgres',

@@ -162,7 +162,7 @@ async function bookAppointmentHandler(
  *
  * @param req - The request object containing the appointment cancellation arguments.
  * @param res - The response object to send the appointment cancellation result.
- * @returns A JSON response containing the cancelled appointment.
+ * @returns A JSON response containing the canceled appointment.
  */
 async function cancelAppointmentHandler(
   req: Request<Omit<CancelAppointmentArgs, 'user'>>,

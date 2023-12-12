@@ -179,6 +179,12 @@ export class Notification {
   @Column()
   message: string
 
+  @Column({ default: false })
+  viewed: boolean
+
   @CreateDateColumn()
   created_date: Date
+
+  @UpdateDateColumn()
+  updated_date: Date
 }

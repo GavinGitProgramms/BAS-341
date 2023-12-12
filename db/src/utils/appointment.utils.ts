@@ -7,7 +7,13 @@ import {
   MoreThanOrEqual,
 } from 'typeorm'
 import { AppDataSource } from '../data-source'
-import { Appointment, AppointmentType, UserType } from '../entity'
+import {
+  Appointment,
+  AppointmentType,
+  NotificationType,
+  User,
+  UserType,
+} from '../entity'
 import type {
   AppointmentDto,
   BookAppointmentArgs,
@@ -19,6 +25,7 @@ import type {
   SearchResults,
 } from '../types'
 import { ensureInitialized, likeStr } from './db.utils'
+import { createNotification } from './notification.utils'
 import { expandUser, userDto } from './user.utils'
 
 /**
@@ -252,6 +259,7 @@ export async function createAppointment({
   appointment.end_time = end_time
 
   const newAppointment = await appointmentRepo.save(appointment)
+
   return appointmentDto(newAppointment)
 }
 
@@ -332,6 +340,10 @@ export async function bookAppointment({
   // Set the appointment user and save the changes to the database
   appointment.user = user
   const updatedAppointment = await appointmentRepo.save(appointment)
+
+  const message = `Your appointment has been booked by ${user.first_name} ${user.last_name}.`
+  createAppointmentNotification(appointment.provider, message)
+
   return appointmentDto(updatedAppointment)
 }
 
@@ -344,8 +356,8 @@ export async function bookAppointment({
  * canceled and no longer be able to book by regular users.
  *
  * @param {CancelAppointmentArgs} args - The arguments for cancelling an appointment.
- * @returns {Promise<AppointmentDto>} - The cancelled appointment.
- * @throws {Error} - If the appointment doesn't exist, is already cancelled, or the end time has passed. Also, if the appointment is not booked or the user trying to cancel is not the one who booked it.
+ * @returns {Promise<AppointmentDto>} - The canceled appointment.
+ * @throws {Error} - If the appointment doesn't exist, is already canceled, or the end time has passed. Also, if the appointment is not booked or the user trying to cancel is not the one who booked it.
  */
 export async function cancelAppointment({
   id,
@@ -398,11 +410,20 @@ export async function cancelAppointment({
     appointment.user = null
   } else {
     // For service providers and admin users, cancelling an appointment
-    // marks the appointment as cancelled.
+    // marks the appointment as canceled.
     appointment.canceled = true
   }
 
   const updatedAppointment = await appointmentRepo.save(appointment)
+
+  if (user?.type === UserType.REGULAR) {
+    const message = `Your appointment with ${user.first_name} ${user.last_name} has been canceled.`
+    createAppointmentNotification(appointment.provider, message)
+  } else if (user?.type === UserType.SERVICE_PROVIDER && appointment.user) {
+    const message = `Your appointment with ${appointment.provider.first_name} ${appointment.provider.last_name} has been canceled.`
+    createAppointmentNotification(appointment.user, message)
+  }
+
   return appointmentDto(updatedAppointment)
 }
 
@@ -450,4 +471,24 @@ export function appointmentDto({
     user: user ? userDto(user) : null,
     provider: provider ? userDto(provider) : null,
   }
+}
+
+/**
+ * Creates an appointment notification for a user.
+ *
+ * @param user - The user to create the notification for.
+ * @param message - The message content of the notification.
+ */
+function createAppointmentNotification(user: User, message: string) {
+  setTimeout(() => {
+    try {
+      createNotification({
+        type: NotificationType.APP,
+        user,
+        message,
+      })
+    } catch (err) {
+      console.error(`failed to create appointment notification: ${err}`)
+    }
+  })
 }

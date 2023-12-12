@@ -1,4 +1,9 @@
-import type { AppointmentType, User, UserType } from '../entity'
+import type {
+  AppointmentType,
+  NotificationType,
+  User,
+  UserType,
+} from '../entity'
 
 /**
  * Arguments for retrieving a user by their username.
@@ -95,5 +100,47 @@ export type CancelAppointmentArgs = {
   /** The ID of the appointment. */
   id: string
   /** The user associated with the appointment. */
+  user: User | string
+}
+
+/**
+ * Arguments for creating a new notification.
+ */
+export type CreateNotificationArgs = {
+  /** The type of notification. */
+  type: NotificationType
+  /** The notification recipient. */
+  user: User | string
+  /** The notification content. */
+  message: string
+}
+
+/**
+ * Arguments for viewing a notification.
+ */
+export type ViewNotificationArgs = {
+  /** The ID of the notification. */
+  id: string
+
+  /** The user associated with the notification. */
+  user: User | string
+}
+
+/**
+ * Arguments for getting a notification.
+ */
+export type GetNotificationArgs = {
+  /** The ID of the notification. */
+  id: string
+
+  /** The user associated with the notification. */
+  user: User | string
+}
+
+/**
+ * Arguments for listing notifications.
+ */
+export type ListNotificationsArgs = {
+  /** The user associated with the notifications. */
   user: User | string
 }

@@ -1,11 +1,12 @@
 import bodyParser from 'body-parser'
-import morgan from 'morgan'
 import express from 'express'
 import session from 'express-session'
+import morgan from 'morgan'
 import 'reflect-metadata'
 import { v4 } from 'uuid'
 import appointmentRouter from './routers/appointment.router'
 import authRouter from './routers/auth.router'
+import notificationRouter from './routers/notification.router'
 import providerRouter from './routers/provider.router'
 
 const app = express()
@@ -31,6 +32,7 @@ app.use(
 app.use('/auth', authRouter)
 app.use('/appointment', appointmentRouter)
 app.use('/provider', providerRouter)
+app.use('/notification', notificationRouter)
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`)

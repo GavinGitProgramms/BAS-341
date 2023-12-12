@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useUser } from '../hooks'
 import BASIcon from '../images/BAS.svg'
 
+import NotificationButton from '../components/NotificationButton'
 import { UserType } from '../types'
 
 export type LayoutProps = {
@@ -63,27 +64,32 @@ export default function Layout({ children }: LayoutProps) {
           </div>
           <div className="flex-none hidden lg:block">
             {isAuthenticated ? (
-              <ul className="menu menu-horizontal">
-                <li>
-                  <Link to="/schedule" className="rounded-btn">
-                    {user && user.type === UserType.ADMIN
-                      ? 'Appointments'
-                      : 'Schedule'}
-                  </Link>
-                </li>
-                {user && user.type === UserType.ADMIN && (
+              <div className="flex items-center">
+                <div className="mt-1 mr-3">
+                  <NotificationButton />
+                </div>
+                <ul className="menu menu-horizontal">
                   <li>
-                    <Link to="/users" className="rounded-btn">
-                      Users
+                    <Link to="/schedule" className="rounded-btn">
+                      {user && user.type === UserType.ADMIN
+                        ? 'Appointments'
+                        : 'Schedule'}
                     </Link>
                   </li>
-                )}
-                <li>
-                  <button onClick={handleLogout} className="rounded-btn">
-                    Log Out
-                  </button>
-                </li>
-              </ul>
+                  {user && user.type === UserType.ADMIN && (
+                    <li>
+                      <Link to="/users" className="rounded-btn">
+                        Users
+                      </Link>
+                    </li>
+                  )}
+                  <li>
+                    <button onClick={handleLogout} className="rounded-btn">
+                      Log Out
+                    </button>
+                  </li>
+                </ul>
+              </div>
             ) : (
               <ul className="menu menu-horizontal">
                 {/* Include other navbar links here for unauthenticated users */}

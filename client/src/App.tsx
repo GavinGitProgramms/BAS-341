@@ -10,6 +10,7 @@ import Schedule from './pages/Schedule'
 import User from './pages/User'
 import Users from './pages/Users'
 import EventProvider from './providers/EventProvider'
+import NotificationsProvider from './providers/NotificationProvider'
 import UserProvider from './providers/UserProvider'
 import { UserType } from './types'
 
@@ -17,7 +18,9 @@ export default function App() {
   return (
     <UserProvider>
       <EventProvider>
-        <AppRoutes />
+        <NotificationsProvider>
+          <AppRoutes />
+        </NotificationsProvider>
       </EventProvider>
     </UserProvider>
   )

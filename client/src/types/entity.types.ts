@@ -21,11 +21,24 @@ export enum EventType {
   USER_DISABLED = 'USER_DISABLED',
 }
 
+export enum NotificationType {
+  APP = 'APP',
+  SMS = 'SMS',
+  EMAIL = 'EMAIL',
+}
+
 /* ~~~ Entities ~~~~ */
 
 export type BaseEntity<T> = {
-  created_date: Date
-  updated_date: Date
+  /**
+   * The date and time that the entity was created.
+   */
+  created_date: string
+
+  /**
+   * The date and time that the entity was updated.
+   */
+  updated_date: string
 } & T
 
 /**
@@ -90,7 +103,42 @@ export type Appointment = BaseEntity<{
   canceled: boolean
 }>
 
+/**
+ * Represents a qualification.
+ */
 export type Qualification = {
+  /**
+   * A unique identifier for a qualification.
+   */
   id: string
+
+  /**
+   * The description of the qualification.
+   */
   description: string
 }
+
+/**
+ * A notification for a user.
+ */
+export type Notification = BaseEntity<{
+  /**
+   * A unique identifier for a notification.
+   */
+  id: string
+
+  /**
+   * The user that the notification is for.
+   */
+  type: NotificationType
+
+  /**
+   * The contents of the notification.
+   */
+  message: string
+
+  /**
+   * Whether the user has viewed the notification.
+   */
+  viewed: boolean
+}>
