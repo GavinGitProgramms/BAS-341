@@ -78,7 +78,15 @@ export function AppointmentStats({ stats }: AppointmentStatsProps) {
         },
       },
     },
-    scales: { y: { beginAtZero: true } },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: 1,
+          precision: 0,
+        },
+      },
+    },
   }
 
   const pieChartOptions = {

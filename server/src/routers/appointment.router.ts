@@ -40,7 +40,10 @@ async function searchAppointmentsHandler(
       description: req.query.description as string,
       startTime: req.query.startTime as string,
       endTime: req.query.endTime as string,
-      canceled: req.query.canceled === 'true', // Parsing the string to a boolean
+      canceled:
+        req.query.canceled === undefined || req.query.canceled === ''
+          ? undefined
+          : req.query.canceled === 'true',
       page: parseInt(req.query.page as string, 10),
       rowsPerPage: parseInt(req.query.rowsPerPage as string, 10),
       sortField: req.query.sortField as string,

@@ -1,7 +1,7 @@
 import { IoIosHelpCircleOutline } from 'react-icons/io'
 
 export default function HelpButton() {
-  const isDevelopment = import.meta.env.MODE === 'development';
+  const isDevelopment = import.meta.env.MODE === 'development'
   const downloadUrl = isDevelopment ? '/api/help' : '/help'
 
   return (
@@ -10,5 +10,5 @@ export default function HelpButton() {
         <IoIosHelpCircleOutline size="2em" />
       </button>
     </a>
-  );
+  )
 }

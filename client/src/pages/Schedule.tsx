@@ -67,9 +67,9 @@ export default function Schedule() {
                   onClick={handleRowClick}
                   onFiltersChange={isAdmin ? setSearchParams : undefined}
                   initialSearchParams={
-                    user && (isAdmin || isProvider)
-                      ? { startTime: getLocalDateStr(new Date()) }
-                      : { canceled: undefined }
+                    user && isAdmin
+                      ? undefined
+                      : { startTime: getLocalDateStr(new Date()), canceled: false }
                   }
                 />
               </div>

@@ -5,10 +5,10 @@ import {
   UserType,
   checkCredentials,
   createUser,
-  expandUser,
-  searchUsers,
   disableUser,
   enableUser,
+  expandUser,
+  searchUsers,
   userDto,
 } from 'bas-db'
 import { Request, Response, Router } from 'express'

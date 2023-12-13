@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useContext } from 'react'
 import { NotificationsContext } from '../providers/NotificationProvider'
 import { FaEye } from 'react-icons/fa'
-import { IoIosNotificationsOutline } from "react-icons/io"
+import { IoIosNotificationsOutline } from 'react-icons/io'
 
 export default function NotificationButton() {
   const [showMenu, setShowMenu] = useState(false)
@@ -30,7 +30,7 @@ export default function NotificationButton() {
       <button onClick={toggleMenu}>
         <IoIosNotificationsOutline size="2em" />
         {notifications.length > 0 && (
-          <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-blue-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
+          <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 bg-blue-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
             {notifications.length}
           </span>
         )}
@@ -42,14 +42,17 @@ export default function NotificationButton() {
               <div
                 key={index}
                 className="group notification-item p-2 hover:bg-gray-100 hover:text-black border-b border-white cursor-pointer flex justify-between items-center"
+                onClick={() => viewNotification(notification.id)}
               >
-                <span className="w-8 h-8">
+                <div className="w-14 h-8 flex items-center">
                   <FaEye
-                    className="hidden group-hover:flex p-1 text-blue-500 cursor-pointer bg-black rounded-full justify-center items-center"
-                    onClick={() => viewNotification(notification.id)}
+                    size="1.5em"
+                    className="hidden group-hover:flex p-1 text-white cursor-pointer bg-black rounded-full justify-center items-center"
                   />
-                </span>
-                {notification.message}
+                </div>
+                <div>
+                  {notification.message}
+                  </div>
               </div>
             ))
           ) : (

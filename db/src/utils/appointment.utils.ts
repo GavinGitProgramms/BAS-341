@@ -5,6 +5,7 @@ import {
   IsNull,
   LessThanOrEqual,
   MoreThanOrEqual,
+  Not,
 } from 'typeorm'
 import { AppDataSource } from '../data-source'
 import {
@@ -190,6 +191,11 @@ export async function searchAppointments(
   }
 
   allWhereOptions.push({ ...filterWhereOptions, ...mainWhereOptions })
+  const hasWhere = Object.keys(allWhereOptions[0]).length !== 0
+  if (!hasWhere) {
+    allWhereOptions.shift()
+    allWhereOptions.push({ id: Not(IsNull()) })
+  }
 
   const appointments = await appointmentRepo.find({
     where: allWhereOptions,
@@ -437,8 +443,13 @@ export async function cancelAllAppointments(username: string) {
   await ensureInitialized()
   const appointmentRepo = AppDataSource.getRepository(Appointment)
 
+  const user = await expandUser(username)
+
   const appointments = await appointmentRepo.find({
-    where: { user: { username } },
+    where:
+      user.type === UserType.REGULAR
+        ? { user: { username } }
+        : { provider: { username } },
   })
 
   for (const appointment of appointments) {
