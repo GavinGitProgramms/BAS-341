@@ -54,7 +54,10 @@ async function registerHandler(req: Request<CreateUserArgs>, res: Response) {
  * @param res - The response object.
  * @returns A JSON response indicating whether the login was successful or not.
  */
-async function loginHandler(req: Request, res: Response) {
+async function loginHandler(
+  req: Request<{ username: string; password: string }>,
+  res: Response,
+) {
   const { username, password } = req.body
 
   const user = await checkCredentials(username, password)

@@ -1,256 +1,305 @@
-# bas-server
+# 🐟 BAS Server
 
-The Web API for BAS.
+Welcome to the BAS `server`, the RESTful Web API for the Booking Appointments Software (BAS). This server handles all the backend logic, database interactions, and API requests for BAS.
 
-## Getting Started
+## 🎣 Getting Started
+
+To set up the `server` for development, follow these steps to install dependencies, link the `bas-db` library, and start the server.
 
 ### Install NPM Dependencies
 
-```
-npm install
-```
+Ensure Node.js is installed on your system and then install the necessary NPM packages:
+
+`npm install`
 
 ### Link `bas-db`
 
-This Web API requires the `bas-db` shared library. For now, we need to link this locally. You can do this using the following commands:
+The `server` requires the `bas-db` shared library. To link it locally:
 
-```
-cd ../db
-npm install
-npm link
+1. Navigate to the `db` directory and install its dependencies:
 
-cd ../server
-npm install
-npm link bas-db
-```
+   ```
+   cd ../db
+   npm install
+   npm link
+   ```
+
+2. Return to the `server` directory and link `bas-db`:
+
+   ```
+   cd ../server
+   npm install
+   npm link bas-db
+   ```
 
 ### Start the Database
 
-The Web API requires access to a PostgreSQL database. The recommended way to do this during development is to use the `docker-compose.yml` file in the `bas-db` project. Make sure you have `docker` and `docker-compose` or Docker Desktop installed if you choose this method. Then you can use the following commands to start the database:
+The Web API needs a PostgreSQL database. Use Docker for development:
 
-```
-cd ../db
-docker-compose up -d
-```
+1. Ensure `docker` and `docker-compose` or Docker Desktop are installed.
+2. Start the database using:
+
+   ```
+   cd ../db
+   docker-compose up -d
+   ```
 
 ### Start the Server
 
-```
-npm start
-```
+Launch the `server` using:
 
-## Web API
+`npm start`
 
-This document provides an overview of the API endpoints for the application, along with instructions for starting the server and using `curl` to test the endpoints.
+## Available Scripts
 
-### Starting the Server
+Within the `server` directory, various scripts are available:
 
-Before testing the endpoints, make sure to start the server:
+- **Build**: Compiles TypeScript to JavaScript.
 
-```
-npm start
-```
+  `npm run build`
 
-### Endpoints
+- **Watch**: Watches for changes and compiles TypeScript files in real-time.
 
-### 1. Register
+  `npm run watch`
 
-**URL**: `/auth/register`
+- **Logs**: Displays logs if using pm2 for process management.
 
-**Method**: POST
+  `npm run logs`
 
-**Description**: Handles the registration of a new user.
+- **Serve**: Starts the server using pm2.
 
-**Body Parameters**:
+  `npm run serve`
 
-- `username`: The desired username of the user.
-- `type`: The type of user (`ADMIN` or other values, note that `ADMIN` can't be registered from the client-side).
-- `first_name`: The first name of the user.
-- `last_name`: The last name of the user.
-- `email`: The email address of the user.
-- `phone_number`: The phone number of the user.
-- `password`: The password for the user.
+- **Development Mode**: Runs the server in development mode with live updates.
 
-**Sample `curl` Commands**:
+  `npm run dev`
 
-#### Create a Regular User
+- **Linting**: Checks code for stylistic and programming errors.
 
-```bash
-curl -s -X POST http://localhost:3000/auth/register \
-     -H "Content-Type: application/json" \
-     -d '{"username": "test", "type": "REGULAR", "first_name": "Foo", "last_name": "Bar", "email": "foo@bar.com", "phone_number": "+1 608 781-8181", "password": "letmein"}' \
-     -c cookies.txt
-```
+  `npm run lint`
 
-#### Create a Service Provider User
+- **Formatting**: Formats code according to defined standards.
 
-```bash
-curl -s -X POST http://localhost:3000/auth/register \
-     -H "Content-Type: application/json" \
-     -d '{"username": "testProvider", "type": "SERVICE_PROVIDER", "first_name": "Awesome", "last_name": "Services", "email": "awesome@services.com", "phone_number": "+1 608 742-4242", "password": "letmein"}' \
-     -c cookies.txt
-```
+  `npm run format`
 
-> This command saves the session cookie to cookies.txt.
+## 🎣 Dependencies
 
-### 2. Login
+The `server` relies on several key dependencies:
 
-**URL**: `/auth/login`
+- **Express & Body Parser**: For handling HTTP requests.
+- **CORS**: To enable cross-origin requests.
+- **Express-Session**: For managing user sessions.
+- **Morgan**: For HTTP request logging.
+- ... and others (see `package.json` for a full list).
 
-**Method**: POST
+## 🎣 Development Standards
 
-**Description**: Handles the login request and authenticates the user.
+To maintain consistency and code quality, the `server` follows these standards:
 
-**Body Parameters**:
+- **TypeScript**: All server code is written in TypeScript for type safety and clarity.
+- **ESLint & Prettier**: For ensuring coding best practices and uniform formatting (see `.eslintConfig` and `prettier` in `package.json`).
 
-- `username`: The username of the user.
-- `password`: The password of the user.
+## 🎣 Web API
 
-**Sample `curl` Command**:
+This section provides an overview of the RESTful API endpoints for the `server`.
 
-```bash
-curl -s -X POST http://localhost:3000/auth/login \
-     -H "Content-Type: application/json" \
-     -d '{"username": "testProvider", "password": "letmein"}' \
-     -c cookies.txt
-```
+### ✨ Auth Router (`/auth`)
 
-> This command saves the session cookie to cookies.txt.
+This section provides an overview of the RESTful API endpoints under the `/auth` router for the `server`.
 
-### 3. Logout
+#### Register
 
-**URL**: `/auth/logout`
+- **URL**: `/auth/register`
+- **Method**: POST
+- **Description**: Handles the registration of a new user.
+- **Body Parameters**:
+  - `username`: The desired username of the user.
+  - `type`: The type of user (`REGULAR`, `SERVICE_PROVIDER`, `ADMIN`). Note: `ADMIN` cannot be registered from the client-side.
+  - `first_name`: The first name of the user.
+  - `last_name`: The last name of the user.
+  - `email`: The email address of the user.
+  - `phone_number`: The phone number of the user.
+  - `password`: The password for the user.
 
-**Method**: GET
+#### Login
 
-**Description**: Logout handler function that destroys the session and clears the session cookie.
+- **URL**: `/auth/login`
+- **Method**: POST
+- **Description**: Handles the login request and authenticates the user.
+- **Body Parameters**:
+  - `username`: The username of the user.
+  - `password`: The password of the user.
 
-**Sample `curl` Command**:
+#### Logout
 
-```bash
-curl -s -X GET http://localhost:3000/auth/logout -b cookies.txt
-```
+- **URL**: `/auth/logout`
+- **Method**: GET
+- **Description**: Logs out the authenticated user by destroying the session.
+- **Authentication Required**: Yes
 
-> This command uses the session cookie from cookies.txt.
+#### Get Authenticated User
 
-### 4. Get User
+- **URL**: `/auth/user`
+- **Method**: GET
+- **Description**: Retrieves the data of the currently authenticated user.
+- **Authentication Required**: Yes
 
-**URL**: `/auth/user`
+#### Search Users (Admin Only)
 
-**Method**: GET
-
-**Description**: Handles the GET request to data for a specific user.
-
-**Sample `curl` Command**:
-
-```bash
-curl -s -X GET http://localhost:3000/auth/user -b cookies.txt
-```
-
-> This command uses the session cookie from cookies.txt.
-
-### 5. Get Booked Appointments
-
-**URL**: `/appointment`
-
-**Method**: GET
-
-**Description**: Retrieves all booked appointments for a user. Requires an authenticated user for access. For use by regular users only.
-
-**Sample `curl` Command**:
-
-```bash
-curl -s -X GET http://localhost:3000/appointment -b cookies.txt
-```
-
-> This command uses the session cookie from cookies.txt.
-
-### 6. Get All Appointments
-
-**URL**: `/appointment/all`
-
-**Method**: GET
-
-**Description**: Gets all appointments for a user, including all booked appointments for the particular user and all unbooked appointments for all service providers. Requires an authenticated user for access. For use by regular users only.
-
-**Sample `curl` Command**:
-
-```bash
-curl -s -X GET http://localhost:3000/appointment/all -b cookies.txt
-```
-
-> This command uses the session cookie from cookies.txt.
-
-### 7. Get Specific Booked Appointment
-
-**URL**: `/appointment/:appointmentId`
-
-**Method**: GET
-
-**Description**: Handles GET requests for a specific booked appointment by ID for a given user. Requires an authenticated user for access. For use by regular users only.
-
-**URL Parameters**:
-
-- `appointmentId`: ID of the appointment.
-
-**Sample `curl` Command**:
-
-```bash
-APPT_ID='0cc12562-a55c-4335-a10c-9ebc3e615902'
-curl -s -X GET http://localhost:3000/appointment/$APPT_ID -b cookies.txt
-```
-
-> This command uses the session cookie from cookies.txt.
-
-### 8. Create New Appointment
-
-**URL**: `/appointment`
-
-**Method**: POST
-
-**Description**: Creates a new appointment for a service provider. Requires an authenticated user for access. For use by service provider users only.
-
-**Body Parameters**:
-
-- `type`: The type of appointment.
-- `start_time`: The start time of the appointment.
-- `end_time`: The end time of the appointment.
-
-**Sample `curl` Command**:
-
-```bash
-curl -s -X POST http://localhost:3000/appointment \
-     -H "Content-Type: application/json" \
-     -d '{"type": "MEDICAL", "start_time": "2023-10-10T10:00:00Z", "end_time": "2023-10-10T11:00:00Z"}' \
-     -b cookies.txt
-```
-
-### 9. Book an Appointment
-
-**URL**: `/appointment/book`
-
-**Method**: POST
-
-**Description**: Handles the request to book an appointment. Requires an authenticated user for access. For use by regular users only.
-
-**Body Parameters**:
-
-- `id`: The ID of the appointment.
-
-**Sample `curl` Command**:
-
-```bash
-curl -s -X POST http://localhost:3000/appointment/book \
-     -H "Content-Type: application/json" \
-     -d '{"id": "f3844432-be0e-4eb2-89f1-7efb7f566489"}' \
-     -b cookies.txt
-```
-
-> This command uses the session cookie from cookies.txt.
-
-```bash
-curl -s -X POST http://localhost:3000/provider/qualification \
-     -H "Content-Type: application/json" \
-     -d '{"description": "AWESOME"}' \
-     -b cookies.txt
-```
+- **URL**: `/auth/user/search`
+- **Method**: GET
+- **Description**: Allows searching of users based on various criteria. Available only for admins.
+- **Query Parameters**:
+  - `username`, `type`, `firstName`, `lastName`, `phoneNumber`, `email`: Filters for searching users.
+  - `page`, `rowsPerPage`: Pagination parameters.
+  - `sortField`, `sortDirection`: Sorting parameters.
+  - `enabled`: Filter for user status (enabled/disabled).
+- **Authentication Required**: Yes, Admin
+
+#### Enable User (Admin Only)
+
+- **URL**: `/auth/user/enable/:username`
+- **Method**: PUT
+- **Description**: Enables a user account. Available only for admins.
+- **URL Parameters**:
+  - `username`: The username of the user to enable.
+- **Authentication Required**: Yes, Admin
+
+#### Disable User (Admin Only)
+
+- **URL**: `/auth/user/disable/:username`
+- **Method**: PUT
+- **Description**: Disables a user account. Available only for admins.
+- **URL Parameters**:
+  - `username`: The username of the user to disable.
+- **Authentication Required**: Yes, Admin
+
+#### Get User by Username (Admin Only)
+
+- **URL**: `/auth/user/:username`
+- **Method**: GET
+- **Description**: Retrieves user data based on the username. Available only for admins.
+- **URL Parameters**:
+  - `username`: The username of the user to retrieve information for.
+- **Authentication Required**: Yes, Admin
+
+### ✨ Appointment Router (`/appointment`)
+
+This section outlines the RESTful API endpoints under the `/appointment` router, responsible for handling various appointment-related operations in BAS.
+
+#### Create Appointment
+
+- **URL**: `/appointment`
+- **Method**: POST
+- **Description**: Creates a new appointment for a service provider.
+- **Authentication Required**: Yes, Service Provider
+- **Body Parameters**:
+  - `type`: The type of appointment (`BEAUTY`, `FITNESS`, `MEDICAL`, etc.).
+  - `description`: The description of the appointment.
+  - `start_time`: The start time of the appointment.
+  - `end_time`: The end time of the appointment.
+
+#### Search Appointments
+
+- **URL**: `/appointment/search`
+- **Method**: GET
+- **Description**: Searches for appointments based on various criteria.
+- **Authentication Required**: Yes
+- **Query Parameters**:
+  - `userId`, `providerId`: Filters for specific users or providers.
+  - `type`: Appointment type.
+  - `description`: Text to match in the appointment description.
+  - `startTime`, `endTime`: Time range for the appointment.
+  - `canceled`: Whether to include canceled appointments.
+  - `page`, `rowsPerPage`: Pagination parameters.
+  - `sortField`, `sortDirection`: Sorting parameters.
+  - `unbookedOnly`: Whether to include only unbooked appointments.
+
+#### Book Appointment
+
+- **URL**: `/appointment/book`
+- **Method**: POST
+- **Description**: Books an appointment for a regular user.
+- **Authentication Required**: Yes, Regular User
+- **Body Parameters**:
+  - `id`: The ID of the appointment to book.
+
+#### Cancel Appointment
+
+- **URL**: `/appointment/cancel`
+- **Method**: POST
+- **Description**: Cancels an existing appointment.
+- **Authentication Required**: Yes
+- **Body Parameters**:
+  - `id`: The ID of the appointment to cancel.
+
+#### Get Appointment by ID
+
+- **URL**: `/appointment/:appointmentId`
+- **Method**: GET
+- **Description**: Retrieves the details of a specific appointment by its ID.
+- **Authentication Required**: Yes
+- **URL Parameters**:
+  - `appointmentId`: The ID of the appointment to retrieve.
+
+### ✨ Provider Router (`/provider`)
+
+This section describes the RESTful API endpoints under the `/provider` router, which handles operations related to service providers in BAS.
+
+#### Create Qualification
+
+- **URL**: `/provider/qualification`
+- **Method**: POST
+- **Description**: Creates a new qualification for a service provider.
+- **Authentication Required**: Yes
+- **Body Parameters**:
+  - `description`: The description of the qualification.
+
+### ✨ Notification Router (`/notification`)
+
+This section details the RESTful API endpoints under the `/notification` router, which manages operations related to notifications in BAS.
+
+#### List Notifications
+
+- **URL**: `/notification/list`
+- **Method**: GET
+- **Description**: Lists all notifications for the authenticated user.
+- **Authentication Required**: Yes
+
+#### Get Notification by ID
+
+- **URL**: `/notification/:notificationId`
+- **Method**: GET
+- **Description**: Retrieves a specific notification by its ID.
+- **Authentication Required**: Yes
+- **URL Parameters**:
+  - `notificationId`: The ID of the notification to retrieve.
+
+#### View Notification
+
+- **URL**: `/notification/view/:notificationId`
+- **Method**: POST
+- **Description**: Marks a notification as viewed by the authenticated user.
+- **Authentication Required**: Yes
+- **URL Parameters**:
+  - `notificationId`: The ID of the notification to mark as viewed.
+
+### Report Router (`/report`)
+
+This section outlines the RESTful API endpoint under the `/report` router, which is used for generating reports related to appointments in BAS.
+
+#### ✨ Generate Appointment Report
+
+- **URL**: `/report/appointment`
+- **Method**: GET
+- **Description**: Generates a comprehensive report of appointments based on various criteria. This report includes statistics like appointment count by type, appointment status count, average duration, appointments over time, appointment count by provider, and user participation.
+- **Authentication Required**: Yes, Admin
+- **Query Parameters**:
+  - `userId`, `providerId`: Filters for specific users or providers.
+  - `type`: Appointment type.
+  - `description`: Text to match in the appointment description.
+  - `startTime`, `endTime`: Time range for the appointment.
+  - `canceled`: Whether to include canceled appointments.
+  - `page`, `rowsPerPage`: Pagination parameters.
+  - `sortField`, `sortDirection`: Sorting parameters.
+  - `unbookedOnly`: Whether to include only unbooked appointments.
