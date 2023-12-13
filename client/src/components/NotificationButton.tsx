@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useContext } from 'react'
 import { NotificationsContext } from '../providers/NotificationProvider'
-import { FaBell, FaEye } from 'react-icons/fa'
+import { FaEye } from 'react-icons/fa'
+import { IoIosNotificationsOutline } from "react-icons/io"
 
 export default function NotificationButton() {
   const [showMenu, setShowMenu] = useState(false)
@@ -27,7 +28,7 @@ export default function NotificationButton() {
   return (
     <div ref={menuRef} className="relative">
       <button onClick={toggleMenu}>
-        <FaBell />
+        <IoIosNotificationsOutline size="2em" />
         {notifications.length > 0 && (
           <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-blue-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
             {notifications.length}

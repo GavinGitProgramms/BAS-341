@@ -8,6 +8,7 @@ import appointmentRouter from './routers/appointment.router'
 import authRouter from './routers/auth.router'
 import notificationRouter from './routers/notification.router'
 import providerRouter from './routers/provider.router'
+import reportRouter from './routers/report.router'
 
 const app = express()
 app.disable('x-powered-by')
@@ -33,6 +34,7 @@ app.use('/auth', authRouter)
 app.use('/appointment', appointmentRouter)
 app.use('/provider', providerRouter)
 app.use('/notification', notificationRouter)
+app.use('/report', reportRouter)
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`)

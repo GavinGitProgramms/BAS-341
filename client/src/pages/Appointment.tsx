@@ -55,7 +55,7 @@ export default function Appointment() {
               <div className="w-full border-t border-white my-4"></div>
               <h2 className="card-title">Appointment Details</h2>
               <div className="w-full border-t border-white my-4"></div>
-              <div className="space-y-4 mb-6">
+              <div className="space-y-4 mb-2">
                 <p>
                   <strong>Type:</strong> {toTitleCase(appointment.type)}
                 </p>

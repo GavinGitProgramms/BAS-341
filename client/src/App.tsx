@@ -6,6 +6,7 @@ import Appointment from './pages/Appointment'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import Report from './pages/Report'
 import Schedule from './pages/Schedule'
 import User from './pages/User'
 import Users from './pages/Users'
@@ -58,6 +59,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute userType={UserType.ADMIN}>
             <Users />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/report"
+        element={
+          <ProtectedRoute userType={UserType.ADMIN}>
+            <Report />
           </ProtectedRoute>
         }
       />

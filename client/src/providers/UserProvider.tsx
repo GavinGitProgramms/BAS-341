@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from 'react'
 import api from '../api'
-import { User } from '../types/entity.types'
 import { CreateUserArgs, LoginArgs } from '../types'
+import { User, UserType } from '../types/entity.types'
 import { errorNotification } from '../utils'
 
 const LOGIN_URL = '/auth/login'
@@ -12,6 +12,8 @@ const REGISTER_URL = '/auth/register'
 export type UserContextType = {
   loading: boolean
   isAuthenticated: boolean
+  isAdmin: boolean
+  isProvider: boolean
   user: User | null
   errMsg: string
   setErrMsg: (msg: string) => void
@@ -28,6 +30,8 @@ function defaultUserContext(): UserContextType {
   return {
     loading: true,
     isAuthenticated: false,
+    isAdmin: false,
+    isProvider: false,
     user: null,
     errMsg: '',
     setErrMsg: () => {},
@@ -136,6 +140,8 @@ export default function UserProvider({ children }: UserProviderProps) {
   const contextValue: UserContextType = {
     loading,
     isAuthenticated,
+    isAdmin: (user && user.type === UserType.ADMIN) || false,
+    isProvider: (user && user.type === UserType.SERVICE_PROVIDER) || false,
     user,
     errMsg,
     setErrMsg,

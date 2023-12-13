@@ -1,3 +1,5 @@
+import queryString from 'query-string'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppointmentsTable from '../components/AppointmentsTable'
 import CreateAppointmentForm from '../components/CreateAppointmentForm'
@@ -5,13 +7,14 @@ import { useAppointments, useUser } from '../hooks'
 import AppointmentImg from '../images/Appointment.png'
 import ScheduleImg from '../images/Schedule.png'
 import Layout from '../layout/Layout'
-import { UserType } from '../types'
+import { SearchAppointmentsDto, UserType } from '../types'
 import { getLocalDateStr } from '../utils'
 
 export default function Schedule() {
-  const { user } = useUser()
+  const { user, isAdmin, isProvider } = useUser()
   const navigate = useNavigate()
   const { createAppointment } = useAppointments()
+  const [searchParams, setSearchParams] = useState<SearchAppointmentsDto>()
 
   const appointmentsTitle =
     user && user.type === UserType.SERVICE_PROVIDER
@@ -25,6 +28,13 @@ export default function Schedule() {
 
   function handleRowClick(appointmentId: string) {
     navigate(`/appointment/${appointmentId}`)
+  }
+
+  function handleReportRedirect() {
+    if (searchParams) {
+      const query = queryString.stringify(searchParams)
+      navigate(`/report?${query}`)
+    }
   }
 
   return (
@@ -41,14 +51,23 @@ export default function Schedule() {
                 />
               </figure>
               <div className="card-body">
-                <h2 className="card-title">{listTitle}</h2>
+                <div className="flex justify-between">
+                  <h2 className="card-title">{listTitle}</h2>
+                  {isAdmin && (
+                    <button
+                      onClick={handleReportRedirect}
+                      className="btn btn-primary"
+                    >
+                      Generate Report
+                    </button>
+                  )}
+                </div>
                 {/* For regular users, show a table of appointments that they have booked */}
                 <AppointmentsTable
                   onClick={handleRowClick}
+                  onFiltersChange={isAdmin ? setSearchParams : undefined}
                   initialSearchParams={
-                    user &&
-                    (user.type === UserType.REGULAR ||
-                      user.type === UserType.SERVICE_PROVIDER)
+                    user && (isAdmin || isProvider)
                       ? { startTime: getLocalDateStr(new Date()) }
                       : { canceled: undefined }
                   }
@@ -57,7 +76,7 @@ export default function Schedule() {
             </div>
           </div>
 
-          {user && user.type === UserType.ADMIN ? (
+          {user && isAdmin ? (
             <></>
           ) : (
             <div className="w-full xl:w-2/3 px-2 mb-4">
@@ -73,7 +92,7 @@ export default function Schedule() {
                   <div className="flex">
                     <h2 className="card-title w-1/3">{appointmentsTitle}</h2>
                   </div>
-                  {user && user.type === UserType.SERVICE_PROVIDER ? (
+                  {user && isProvider ? (
                     <CreateAppointmentForm onSubmit={createAppointment} />
                   ) : (
                     // For regular users, show a table of appointments that haven't been booked yet

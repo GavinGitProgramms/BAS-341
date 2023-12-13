@@ -1,9 +1,9 @@
 import { Toaster } from 'react-hot-toast'
 import { Link, useLocation } from 'react-router-dom'
+import HelpButton from '../components/HelpButton'
+import NotificationButton from '../components/NotificationButton'
 import { useUser } from '../hooks'
 import BASIcon from '../images/BAS.svg'
-
-import NotificationButton from '../components/NotificationButton'
 import { UserType } from '../types'
 
 export type LayoutProps = {
@@ -62,12 +62,22 @@ export default function Layout({ children }: LayoutProps) {
               <span className="ml-2 align-middle">BAS</span>
             </Link>
           </div>
+
+          {/* Notification Button - Always Visible */}
+          {isAuthenticated && (
+            <>
+              <div className="flex-none mt-1.5 mr-6">
+                <NotificationButton />
+              </div>
+              <div className="flex-none mr-3">
+                <HelpButton />
+              </div>
+            </>
+          )}
+
           <div className="flex-none hidden lg:block">
             {isAuthenticated ? (
               <div className="flex items-center">
-                <div className="mt-1 mr-3">
-                  <NotificationButton />
-                </div>
                 <ul className="menu menu-horizontal">
                   <li>
                     <Link to="/schedule" className="rounded-btn">
@@ -101,6 +111,7 @@ export default function Layout({ children }: LayoutProps) {
         {/* Content */}
         <main className="w-full">{children}</main>
       </div>
+
       {isAuthenticated && (
         <div className="drawer-side">
           <label htmlFor="main-drawer" className="drawer-overlay"></label>

@@ -32,10 +32,10 @@ export default function NotificationsProvider({
   const { listNotifications, getNotification, viewNotification } =
     useNotifications()
 
-    async function fetchNotifications() {
-      const fetchedNotifications = await listNotifications()
-      setNotifications(fetchedNotifications)
-    }
+  async function fetchNotifications() {
+    const fetchedNotifications = await listNotifications()
+    setNotifications(fetchedNotifications)
+  }
 
   useEffect(() => {
     if (!isAuthenticated) {

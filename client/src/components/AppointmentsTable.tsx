@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useAppointmentsSearch, useUser } from '../hooks'
 import { AppointmentType, SearchAppointmentsDto, UserType } from '../types'
 import { toTitleCase } from '../utils'
@@ -5,20 +6,25 @@ import { toTitleCase } from '../utils'
 export type AppointmentsTableProps = {
   initialSearchParams?: Partial<SearchAppointmentsDto>
   onClick?: (appointmentId: string) => void
+  onFiltersChange?: (filters: SearchAppointmentsDto) => void
   hideCanceledFilter?: boolean
 }
 
 export default function AppointmentsTable({
   initialSearchParams,
   onClick,
+  onFiltersChange,
   hideCanceledFilter = false,
 }: AppointmentsTableProps) {
-  const { user } = useUser()
+  const { user, isAdmin, isProvider } = useUser()
   const { appointments, searchParams, setSearchParams } =
     useAppointmentsSearch(initialSearchParams)
 
-  const isProviderView = user?.type === UserType.SERVICE_PROVIDER
-  const isAdminView = user?.type === UserType.ADMIN
+  useEffect(() => {
+    if (onFiltersChange) {
+      onFiltersChange(searchParams)
+    }
+  }, [searchParams])
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -157,7 +163,7 @@ export default function AppointmentsTable({
               onChange={handleInputChange}
               className="select select-bordered w-full"
             >
-              {isAdminView && <option value="">Select a Value</option>}
+              {isAdmin && <option value="">Select a Value</option>}
               <option value="true">Yes</option>
               <option value="false">No</option>
             </select>
@@ -214,12 +220,8 @@ export default function AppointmentsTable({
               {renderHeaderCell('Description', 'description')}
               {renderHeaderCell('Start Time', 'start_time')}
               {renderHeaderCell('End Time', 'end_time')}
-              {isProviderView && (
-                <th className="px-6 py-3 select-none">Booked</th>
-              )}
-              {isAdminView && (
-                <th className="px-6 py-3 select-none">Canceled</th>
-              )}
+              {isProvider && <th className="px-6 py-3 select-none">Booked</th>}
+              {isAdmin && <th className="px-6 py-3 select-none">Canceled</th>}
             </tr>
           </thead>
           <tbody>
@@ -251,12 +253,12 @@ export default function AppointmentsTable({
                 <td className="px-6 py-4">
                   {new Date(appointment.end_time).toLocaleString()}
                 </td>
-                {isProviderView && (
+                {isProvider && (
                   <td className="px-6 py-4">
                     {appointment.user ? 'Yes' : 'No'}
                   </td>
                 )}
-                {isAdminView && (
+                {isAdmin && (
                   <td className="px-6 py-4">
                     {appointment.canceled ? 'Yes' : 'No'}
                   </td>
