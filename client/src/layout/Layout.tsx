@@ -66,7 +66,7 @@ export default function Layout({ children }: LayoutProps) {
           {/* Notification Button - Always Visible */}
           {isAuthenticated && (
             <>
-              <div className="flex-none mt-1.5 mr-6">
+              <div className="flex-none mt-[0.1em] mr-6">
                 <NotificationButton />
               </div>
               <div className="flex-none mr-3">

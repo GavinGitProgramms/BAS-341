@@ -2,6 +2,7 @@ import bodyParser from 'body-parser'
 import express from 'express'
 import session from 'express-session'
 import morgan from 'morgan'
+import path from 'path'
 import 'reflect-metadata'
 import { v4 } from 'uuid'
 import appointmentRouter from './routers/appointment.router'
@@ -12,6 +13,20 @@ import reportRouter from './routers/report.router'
 
 const app = express()
 app.disable('x-powered-by')
+
+const MANUAL_NAME = 'BAS-Manual.pdf'
+
+app.get('/help', (req, res) => {
+  const file = path.join(__dirname, '..', 'public', MANUAL_NAME)
+  res.download(file, MANUAL_NAME, (err) => {
+    if (err) {
+      console.error(err)
+      if (!res.headersSent) {
+        res.status(500).send('Error occurred while downloading the file.')
+      }
+    }
+  })
+})
 
 const PORT = process.env.PORT || 3000
 
